@@ -267,15 +267,15 @@ theorem mem_mono_ideal_iff_term_mem :
 
 -- omit A A_is_monomial_set
 
-theorem support_zero_iff : p = 0 ↔ p.support = ∅ :=
-  by
-  constructor
-  · intro hp
-    rw [hp]
-    exact support_zero
-  · intro hps
-    rw [as_sum p, hps]
-    exact rfl
-#align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
+-- theorem support_zero_iff : p = 0 ↔ p.support = ∅ :=
+--   by
+--   constructor
+--   · intro hp
+--     rw [hp]
+--     exact support_zero
+--   · intro hps
+--     rw [as_sum p, hps]
+--     exact rfl
+-- #align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
 
 end MvPolynomial

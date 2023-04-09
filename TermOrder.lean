@@ -4,6 +4,8 @@ import Mathlib.Logic.Nontrivial
 import Mathlib.Order.Basic
 import Mathlib.Data.Finsupp.Basic
 
+-- refer to https://github.com/leanprover-community/mathlib4/blob/master/Mathlib/Order/Synonym.lean
+
 universe u
 -- variable {σ: Type u}
 variable {α : Type u}
@@ -19,7 +21,7 @@ def toTermOrder : α ≃ TermOrder α :=
   Equiv.refl _
 #align to_term_order toTermOrder
 
-/-- `ofTermOrder` is the identity function from the `term_order` of a type.  -/
+/-- `ofTermOrder` is the identity function from the `TermOrder` of a type.  -/
 @[match_pattern]
 def ofTermOrder : TermOrder α ≃ α :=
   Equiv.refl _
@@ -74,12 +76,9 @@ variable [le': LE (TermOrder (σ →₀ ℕ))]
 variable (a: TermOrder (σ →₀ ℕ)) (b: TermOrder (σ →₀ ℕ))
 
 
-noncomputable def test := a+b ≤ a
-
 class TermOrderClass (σ : Type _) [Finite σ] extends LinearOrder (TermOrder (σ →₀ ℕ)) where
   Additive : ∀ v v₁ v₂ : TermOrder (σ →₀ ℕ), v₁ ≤ v₂ → v + v₁ ≤ v + v₂
   zero_le : ∀ v : TermOrder (σ →₀ ℕ), 0 ≤ v
 -- #align mv_polynomial.term_order MvPolynomial.TermOrder
 
-#print test
 end TermOrder
