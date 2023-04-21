@@ -1,41 +1,41 @@
+
 import Mathlib.Data.MvPolynomial.Basic
 import Mathlib.Algebra.Hom.Embedding
 import Mathlib.Algebra.MonoidAlgebra.Support
 import Mathlib.Data.Finset.Basic
 import Mathlib.Data.Finset.Image
--- import Mathlib.Data.Multiset.Basic
-import Mathlib.Tactic.LibrarySearch
-
-variable {σ : Type _} {a a' a₁ a₂ : R} {n m : σ} {s : σ →₀ ℕ}
-
+-- import Mathlib.Tactic.LibrarySearch
 namespace MvPolynomial
-variable [CommSemiring R]
-
+variable {σ : Type _} {a a' a₁ a₂ : R} [CommSemiring R]
+variable {n m : σ} {s : σ →₀ ℕ}
+variable (p: MvPolynomial σ R)
 @[simp]
-lemma smul_monomial: a' • monomial s a = monomial s (a' * a) := by
+lemma «smul_monomial»: a • monomial s a' = monomial s (a * a') := by
   rw [smul_eq_C_mul, C_mul_monomial]
-
-theorem support_zero_iff (p: MvPolynomial σ R): p = 0 ↔ p.support = ∅ :=
-  by
+theorem support_zero_iff: p = 0 ↔ p.support = ∅ := by
   constructor
-  · intro hp
+  ·
+    intro hp
     rw [hp]
     exact support_zero
-  · intro hps
-    rw [as_sum p, hps]
-    exact rfl
-#align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
+  ·
+    intro hps
+    rw [as_sum p, hps, Finset.sum_empty]
+-- #align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
+@[simp]
+theorem
+  support_smul_eq [NoZeroDivisors R] {a : R} (ha: a≠0) {f: MvPolynomial σ R}:
+  (a • f).support = f.support := Finsupp.support_smul_eq ha
+
 
 @[simp]
-theorem support_smul_eq [IsDomain R] {a : R} (ha: a≠0) {f: MvPolynomial σ R}:
-    (a • f).support = f.support := Finsupp.support_smul_eq ha
-
-
-@[simp]
-theorem support_mul_monomial [IsDomain R] (ha: a ≠ 0):
+theorem support_mul_monomial [NoZeroDivisors R] {a: R} (ha: a ≠ 0):
     (p * (monomial s a)).support = p.support.map (addRightEmbedding s) := by
-  let key (q) := ∃ (s': σ→₀ℕ) (a': R), monomial s' a' = q ∧
-          (a' ≠ 0 → (p * (monomial s' a')).support = p.support.map (addRightEmbedding s'))
+  let key (q) :=
+    ∃ (s': σ→₀ℕ) (a': R),
+        monomial s' a' = q ∧
+        (a' ≠ 0 →
+          (p * (monomial s' a')).support = p.support.map (addRightEmbedding s'))
   have hkey: key (monomial s a) := by
     apply induction_on_monomial
     ·
@@ -68,7 +68,8 @@ theorem support_mul_monomial [IsDomain R] (ha: a ≠ 0):
   simp only [monomial_eq_monomial_iff, ha, and_false, or_false] at hkey'
   exact (hkey'.1 ▸ hkey'.2 ▸ hkey) ha
 
+
 @[simp]
-theorem support_monomial_mul [IsDomain R] (ha: a ≠ 0):
+theorem support_monomial_mul [NoZeroDivisors R] {a: R} (ha: a ≠ 0):
     ((monomial s a) * p).support = p.support.map (addRightEmbedding s) :=
-    mul_comm p (monomial s a) ▸ support_mul_monomial ha
+    mul_comm p (monomial s a) ▸ support_mul_monomial p ha

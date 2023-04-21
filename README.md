@@ -8,8 +8,8 @@ Mainly based on the book [_Ideals, Varieties, and Algorithms_](https://link.spri
 
 - `TermOrder`: monomial orderings (Definition 1, page 71). The formal definition is from https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Override.20default.20ordering.20instance/near/339882298 and https://github.com/leanprover-community/mathlib4/blob/master/Mathlib/Order/Synonym.lean
 - `multideg` multidegree, `lt` leading coefficient, `lm` leading monomial and `lt` leading term
-- `Reg`: division algorithm (partial Theorem 3, page 64) gives a remainder
-- `isReg`: non-constructive equivalent definition of division
+<!--- `Reg`: division algorithm (partial Theorem 3, page 64) gives a remainder
+- `isReg`: non-constructive equivalent definition of division-->
 
 ## Lemmas and theorems
 
@@ -18,10 +18,10 @@ Mainly based on the book [_Ideals, Varieties, and Algorithms_](https://link.spri
     1. $f\in I$.
     2. Every term of $f$ lies in $I$.
 - Some simple properties of monomial ordering
-- Division Algorithm is well defined
+<!--- Division Algorithm is well defined-->
 
 ## TODO
 
 - More properties of monomial ordering
-- `Reg` and `isReg` is equivalent
+- division algorithm (Theorem 3, page 64) giving a remainder
 - Gröbner basis and its properties
