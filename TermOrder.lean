@@ -2,6 +2,7 @@
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Data.MvPolynomial.Basic
 namespace MvPolynomial
+
 -- refer to https://github.com/leanprover-community/mathlib4/blob/master/Mathlib/Order/Synonym.lean
 
 variable {α : Type _}
@@ -50,25 +51,53 @@ theorem ofTermOrder_inj {a b : TermOrder α} : ofTermOrder a = ofTermOrder b ↔
 protected def TermOrder.rec {β : TermOrder α → Sort _} (h : ∀ a, β (toTermOrder a)) :
   ∀ a, β a := fun a => h (ofTermOrder a)
 -- #align term_order.rec TermOrder.rec
+
+
 namespace TermOrder
 variable [α_add: Add α] [α_zero: Zero α]
 variable [α_add_cancel_comm_monoid: AddCancelCommMonoid α]
 variable [α_inhabited: Inhabited α]
 
-instance add: Add (TermOrder α) := α_add
-instance zero: Zero (TermOrder α) := α_zero
-instance toAddCancelCommMonoid: AddCancelCommMonoid (TermOrder α)
+instance : Add (TermOrder α) := α_add
+instance : Zero (TermOrder α) := α_zero
+instance : AddCancelCommMonoid (TermOrder α)
   := α_add_cancel_comm_monoid
-instance toAddCommMonoid: AddCommMonoid (TermOrder α)
-  := α_add_cancel_comm_monoid.toAddCommMonoid
+instance : Inhabited (TermOrder α) := α_inhabited
 
-instance: Inhabited (TermOrder α) := α_inhabited
+instance
+  [LinearOrder (TermOrder α)]
+  [CovariantClass (TermOrder α) (TermOrder α) (·+·) (·≤·)]
+  [IsWellOrder (TermOrder α) (·<·)] :
+  WellFoundedRelation (TermOrder α) := IsWellOrder.toHasWellFounded
+instance
+  [LinearOrder (TermOrder α)]
+  [IsWellOrder (TermOrder α) (·<·)] :
+  WellFoundedRelation (WithBot (TermOrder α)) :=
+    IsWellOrder.toHasWellFounded
+
+instance {α : Type _}
+  [AddCancelCommMonoid (TermOrder α)] [LinearOrder (TermOrder α)]
+  [CovariantClass (TermOrder α) (TermOrder α) (·+·) (·≤·)] :
+  LinearOrderedAddCommMonoid (TermOrder α) :=
+{
+  add_le_add_left := by
+    intros a b hab c
+    simp only [add_le_add_iff_left, hab]
+}
 end TermOrder
 
-class ZeroLEClass (α: Type _) [Zero α] [LE α] where
-  zero_le (a: α): 0 ≤ a
 
-instance ZeroLEClass.toOrderBot [Zero α] [LE α] [ZeroLEClass α]: OrderBot α :=
+-- @[simp]
+-- lemma zero_le''' (a : α): 0 ≤ a := 
+-- example [Zero α] [LE α] [ZeroLEClass α] : Bot α := inferInstance
+-- from https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Override.20default.20ordering.20instance/near/339882298
+
+variable {β :Type _}
+
+class ZeroLEClass (β: Type _) [Zero β] [LE β] where
+  zero_le (a: β): 0 ≤ a
+
+instance ZeroLEClass.toOrderBot [Zero β] [LE β] [ZeroLEClass β]: OrderBot β :=
   {
     bot := 0
     bot_le := by
@@ -76,48 +105,69 @@ instance ZeroLEClass.toOrderBot [Zero α] [LE α] [ZeroLEClass α]: OrderBot α 
       apply zero_le
   }
 
--- from https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Override.20default.20ordering.20instance/near/339882298
-class TermOrderClass (α : Type _) [AddCancelCommMonoid α]
-  extends LinearOrder α,
-          ZeroLEClass α,
-          IsWellOrder α (·<·),
-          CovariantClass α α (·+·) (·≤·)
+@[simp]
+lemma zero_le''' [Zero β] [LE β] [ZeroLEClass β] (a: β) : 0 ≤ a :=
+  ZeroLEClass.zero_le a
 
-variable [AddCancelCommMonoid α]
-variable [term_order_class: TermOrderClass α]
+-- instance TermOrder.toOrderBot: OrderBot β := 
 
--- instance TermOrder.toOrderBot: OrderBot α := 
+-- instance:
+--   CovariantClass β β (·+·) (·≤·) := inferInstance
 
-instance:
-  CovariantClass α α (·+·) (·≤·) := TermOrderClass.toCovariantClass
+-- instance:
+--   ContravariantClass β β (·+·) (·<·) := inferInstance
+    -- contravariant_add_lt_of_covariant_add_le β
 
-instance:
-  ContravariantClass α α (·+·) (·<·) :=
-    contravariant_add_lt_of_covariant_add_le α
+-- instance:
+--   CovariantClass β β (·+·) (·<·) := inferInstance
+    -- AddLeftCancelSemigroup.covariant_add_lt_of_covariant_add_le (N:=β)
+variable [AddCancelCommMonoid β]
+variable [LinearOrder β] [ZeroLEClass β] [IsWellOrder β (·<·)]
+variable [CovariantClass β β (·+·) (·≤·)]
 
-instance:
-  CovariantClass α α (·+·) (·<·) :=
-    AddLeftCancelSemigroup.covariant_add_lt_of_covariant_add_le (N:=α)
+class TermOrderClass (β : Type _) [AddCancelCommMonoid β]
+  extends LinearOrder β,
+          ZeroLEClass β,
+          IsWellOrder β (·<·),
+          CovariantClass β β (·+·) (·≤·)
 
-instance: LinearOrderedAddCommMonoid α := {
-  add_le_add_left := by
-    intros a b hab c
-    simp only [add_le_add_iff_left, hab]
-}
 
--- @[default_instance]
-instance TermOrder.isWellFoundedRelation: WellFoundedRelation α :=
-  term_order_class.toWellFoundedRelation
+-- instance : WellFoundedRelation β := inferInstance
+-- instance : PartialOrder β := inferInstance
+-- instance : AddCommMonoid β := inferInstance
+-- instance : PartialOrder β := inferInstance
+-- instance : OrderedAddCommMonoid β := inferInstance
+-- instance : Bot β := inferInstance
+
+-- instance : CanonicallyOrderedAddMonoid β := {
+--   bot_le := ZeroLEClass.zero_le
+--   exists_add_of_le := by
+
+-- }
+
 
 variable {σ: Type _} [TermOrderClass (TermOrder (σ→₀ℕ))] {k₁ k₂: σ→₀ℕ}
 
+-- private instance test₂ : LinearOrder (σ→₀ℕ) := tc.toLinearOrder
+
+-- def test : CommMonoid (σ→₀ℕ) := {
+
+-- }
+
+-- instance : ZeroLEClass (σ→₀ℕ) := {
+--   zero_le := by
+--     intros a
+
+-- }
+
 lemma TermOrder.le_of_finsupp_le (h: k₁≤k₂): LE.le (α:=TermOrder (σ→₀ℕ)) k₁ k₂
-  := by
-  rw [←add_tsub_cancel_iff_le.mpr h]
+  := by  
+  rw [←add_tsub_cancel_iff_le.mpr h]  
   -- simp?
   simp only [ge_iff_le, le_add_iff_nonneg_right]
   exact ZeroLEClass.zero_le _
-lemma TermOrder.lt_of_finsupp_lt (h: k₁<k₂): LT.lt (α:=TermOrder (σ→₀ℕ)) k₁ k₂
+
+lemma TermOrder.lt_of_finsupp_lt (h: k₁<k₂): LT.lt (α:=TermOrder (σ→₀ℕ)) k₁ k₂  
   := lt_of_le_of_ne (le_of_finsupp_le (le_of_lt h)) (ne_of_lt (α:=σ→₀ℕ) h)
 
 

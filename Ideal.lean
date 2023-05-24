@@ -1,3 +1,4 @@
+
 import Mathlib.Data.MvPolynomial.Basic
 -- import Mathlib.Data.MvPolynomial.Division
 import Mathlib.Data.MvPolynomial.CommRing
@@ -5,6 +6,7 @@ import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.RingTheory.MvPolynomial.Ideal
 import Mathlib.LinearAlgebra.Finsupp
 import Mathlib.LinearAlgebra.Span
 import Mathlib.Data.Finset.Basic
@@ -16,34 +18,29 @@ import Mathlib.Data.Finsupp.Basic
 -- import Mathlib.Data.Finsupp.WellFounded
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.LibrarySearch
+import Mathlib.Tactic.Substs
 -- import Mathlib.Data.List.Basic
 -- import Mathlib.Data.List.ProdSigma
 import Mathlib.RingTheory.Polynomial.Basic
 -- import Mathlib.Order.WellFounded
-import TermOrder
+-- import TermOrder
+import Division
 
--- import data.mv_polynomial.comm_ring
--- import data.mv_polynomial.comm_ring
--- import data.set.image
--- import data.set.image
--- import ring_theory.
--- import ring_theory.
--- import ring_theory.mv_polynomial.basic
--- import ring_theory.mv_polynomial.basic
--- import ring_theory.nullstellensatz
--- import ring_theory.nullstellensatz
--- import order.min_max
--- import order.min_max
 open BigOperators
 
 open Classical
+open Tactic
 
 namespace Ideal
 
-theorem mem_span_iff {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X) :
-    p ∈ Ideal.span A ↔ ∃ (s : Finset A)(f : X → X), p = ∑ m in s, f m * m :=
-  by
-  let key := Finsupp.mem_span_iff_total X A p
+variable {R : Type _} [Semiring R]
+
+-- mem_span_iff, mem_span_iff', mem_span_iff'' have much shorter proofs in
+-- https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/submodule.2Espan.20as_sum
+
+theorem mem_span_iff (A : Set R) (p : R) :
+    p ∈ Ideal.span A ↔ ∃ (s : Finset A)(f : R → R), p = ∑ m in s, f m * m := by
+  let key := Finsupp.mem_span_iff_total R A p
   simp only [submodule_span_eq] at key
   simp only [key]
   constructor
@@ -60,7 +57,7 @@ theorem mem_span_iff {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X)
   · simp only [forall_exists_index]
     intro sset f hp
     rw [hp]
-    let f' : A → X := fun x => if x ∈ sset then f x else 0
+    let f' : A → R := fun x => if x ∈ sset then f x else 0
     let sset' := Finset.filter (f' · ≠ 0) sset
     have hf' : ∀ x : A, f' x ≠ 0 → x ∈ sset' :=
       by
@@ -72,7 +69,7 @@ theorem mem_span_iff {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X)
       simp only [Ne.def, ite_eq_right_iff, not_forall, exists_prop] at hx
       exact hx
     use Finsupp.onFinset sset' f' hf'
-    rw [Finsupp.total_onFinset X _ _]
+    rw [Finsupp.total_onFinset R _ _]
     rw [(_ : (∑ m : ↥A in sset, f m * m) = ∑ m in sset', f' m * m)]
     rfl
     let diff := sset \ sset'
@@ -102,15 +99,15 @@ theorem mem_span_iff {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X)
     simp only [hx', if_true]
 #align ideal.mem_span_iff Ideal.mem_span_iff
 
-theorem mem_span_iff' {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X) :
-    p ∈ Ideal.span A ↔ ∃ (s : Finset A)(f : A → X), p = ∑ m in s, f m * m :=
+theorem mem_span_iff' (A : Set R) (p : R) :
+    p ∈ Ideal.span A ↔ ∃ (s : Finset A)(f : A → R), p = ∑ m in s, f m * m :=
   by
   rw [mem_span_iff]
   constructor
   · rintro ⟨s, f, hp⟩
     rw [hp]
     use s
-    use f ∘ ((↑): A→X)
+    use f ∘ ((↑): A→R)
     rfl
   · rintro ⟨s, f, hp⟩
     rw [hp]
@@ -119,12 +116,170 @@ theorem mem_span_iff' {X : Type _} [_inst_1 : CommSemiring X] (A : Set X) (p : X
     simp only [Subtype.coe_prop, Subtype.coe_eta, dite_eq_ite, if_true]
 #align ideal.mem_span_iff' Ideal.mem_span_iff'
 
+theorem mem_span_iff'' (A : Set R) (p : R) :
+  p ∈ Ideal.span A ↔ ∃ (s : Finset R) (f : R → R), s.toSet ⊆ A ∧ p = ∑ m in s, f m * m := by
+  rw [mem_span_iff]
+  constructor
+  ·
+    rintro ⟨s, f, h⟩
+    use s.image (fun (x : A) => (↑x : R))
+    use f
+    simp [h]
+  ·
+    rintro ⟨s, f, hs, h⟩
+    by_cases hA : A = ∅
+    ·
+      simp [hA, Set.subset_empty_iff] at hs
+      simp [hs] at h
+      use ∅
+      use f
+      simp [h]
+    cases' Set.nonempty_iff_ne_empty.mpr hA with a ha
+    have : ∀ (x : R), x ∈ s → x ∈ A := by
+      intro x hx
+      apply Set.mem_of_subset_of_mem hs
+      simp [hx]
+    use s.image (fun (x : R) => if hx : x ∈ s then ⟨x, this x hx⟩ else ⟨a, ha⟩)
+    use f
+    rw [h]
+    rw [Finset.sum_image']
+    intro c hc
+    simp [hc]
+    have :
+      s.filter (fun (x : R) =>
+          ((if hx : x ∈ s then ⟨x, this x hx⟩ else ⟨a, ha⟩) = (⟨c, this c hc⟩ : A)))
+      = {c} := by
+      ext c'
+      simp
+      constructor
+      · rintro ⟨hc', h⟩
+        simp [hc'] at h
+        exact h
+      · intro hc'
+        rw [hc']
+        simp [hc]
+    rw [this]
+    simp
+
+theorem fg_span_iff_fg_span_finset_subset (s : Set R) :
+  (span s).Fg ↔ ∃ (s' : Finset R), s'.toSet ⊆ s ∧ span s = span s' := by
+  constructor
+  ·
+    intro hfg
+    let ⟨s₁, hs₁⟩ := hfg
+    have := subset_span (α:=R) (s:=s₁)
+    rw [hs₁] at this
+    let s' := s₁.bunionᵢ
+      (fun x =>
+        if h : x ∈ s₁
+          then ((mem_span_iff s x).mp (Set.mem_of_subset_of_mem this h)).choose.image (fun (x : s) => (↑x : R))
+          else ∅)
+    use s'
+    constructor
+    ·
+      simp
+      intro i hi
+      simp [hi]
+    ·
+      rw [←SetLike.coe_set_eq]
+      apply Set.eq_of_subset_of_subset
+      ·
+        intro a ha
+        rw [←hs₁] at ha
+        simp [mem_span_iff''] at ha
+        rcases ha with ⟨s'', hs'', f , ha⟩
+        rw [ha]
+        apply Ideal.sum_mem
+        intro b hb
+        apply mul_mem_left
+        have hb := Set.mem_of_subset_of_mem hs'' (Finset.mem_coe.mpr hb)
+        change b ∈ s₁ at hb
+        have key :
+          b ∈ span (
+            (fun x => if h : x ∈ s₁
+            then ((mem_span_iff s x).mp (Set.mem_of_subset_of_mem this h)).choose.image (fun (x : s) => (↑x : R))
+            else (∅ : Finset R)) b)
+          := by
+          -- simp only [hb, dite_true]
+          simp [hb]
+          generalize_proofs h₁
+          have := h₁.choose_spec
+          rcases this with ⟨f',hb'⟩
+          nth_rewrite 1 [hb']
+          apply sum_mem
+          intro c hc
+          apply mul_mem_left
+          apply Set.mem_of_subset_of_mem subset_span
+          simp [hc]
+        refine Set.mem_of_subset_of_mem ?_ key
+        apply span_mono
+        rw [Finset.coe_subset]
+        apply Finset.subset_bunionᵢ_of_mem (x:=b) _
+        exact hb
+      ·
+        apply span_mono
+        simp
+        intro i hi
+        simp [hi]
+  ·
+    rintro ⟨s', _, h⟩
+    exact ⟨s', h.symm⟩
+
+@[simp]
+lemma span_singleton_zero:
+  span ({0} : Set R) = ⊥ := by simp only [span_singleton_eq_bot]
+
+@[simp]
+lemma span_sdiff_singleton_zero_eq (s : Set R):
+  span (s \ {0}) = span s := by
+  by_cases h : 0 ∈ s
+  · nth_rewrite 2 [(by simp [h] : s = s \ {0} ∪ {0})]
+    rw [span_union]
+    simp
+  ·simp [h]
+
+
+theorem sum_mul_left_mem_of_subset {G' : Finset R}
+  {I : Ideal R}
+  (hG' : G'.toSet ⊆ I)
+  (f : R → R):
+  G'.sum (fun x => (f x) * x) ∈ I := by
+  apply Ideal.sum_mem
+  intro c hc
+  simp [hc]
+  apply Ideal.mul_mem_left
+  apply Set.mem_of_subset_of_mem hG'
+  simp [hc]
+
+theorem sum_mul_right_mem_of_subset {R : Type _} [CommSemiring R] {G' : Finset R}
+  {I : Ideal R}
+  (hG' : G'.toSet ⊆ I)
+  (f : R → R):
+  G'.sum (fun x => x * (f x)) ∈ I := by
+  conv => enter [1,2,x]; rw [mul_comm]
+  exact sum_mul_left_mem_of_subset hG' f
+
+theorem sum_mul_mem_of_subset' {R : Type _} [CommSemiring R] {G' : Set R}
+  {I : Ideal R}
+  (hG' : G' ⊆ I)
+  (q : G' →₀ R):
+  q.sum (·*·) ∈ I := by
+  apply Ideal.sum_mem
+  intro c hc
+  simp [hc]
+  apply Ideal.mul_mem_right
+  apply Set.mem_of_subset_of_mem hG'
+  simp [hc]
+
 end Ideal
 
 open Ideal
 
--- open set
 namespace MvPolynomial
+
+-- These section is abandoned,
+-- becasuse the equivalent things have committed to Mathlib
+section Abandoned
 
 variable {k : Type _} [Field k]
 
@@ -267,17 +422,177 @@ theorem mem_mono_ideal_iff_term_mem :
     exact hv
 #align mv_polynomial.mem_mono_ideal_iff_term_mem MvPolynomial.mem_mono_ideal_iff_term_mem
 
--- omit A A_is_monomial_set
+end Abandoned
+section Ideal
 
--- theorem support_zero_iff : p = 0 ↔ p.support = ∅ :=
---   by
---   constructor
---   · intro hp
---     rw [hp]
---     exact support_zero
---   · intro hps
---     rw [as_sum p, hps]
---     exact rfl
--- #align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
+variable {σ : Type _} {k : Type _} [Field k]
+variable [term_order_class: TermOrderClass (TermOrder (σ→₀ℕ))]
+
+variable (p : MvPolynomial σ k)
+variable (G': Finset (MvPolynomial σ k)) (G'': Set (MvPolynomial σ k))
+variable (I I₁ I₂ : Ideal (MvPolynomial σ k))
+
+variable {R : Type _} [CommSemiring R]
+
+@[reducible]
+def leading_term_ideal : Ideal (MvPolynomial σ k) := span (leading_term '' G'')
+
+
+lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by  
+  ext q
+  rw [leading_term_ideal]
+  constructor  
+  ·    
+    intro hq
+    rw [mem_span_iff''] at hq
+    rcases hq with ⟨s, f, hs, hq⟩
+    rw [hq]    
+    apply Ideal.sum_mem
+    intro m hm
+    apply Ideal.mul_mem_left    
+    have hm := Set.mem_of_subset_of_mem hs hm
+    rw [Set.mem_image] at hm
+    rcases hm with ⟨p, hp, hm⟩
+    rw [←hm, leading_term_def', smul_eq_C_mul]
+    apply Ideal.mul_mem_left --(span (lm '' G'')) _ (b:=lm p)
+    apply Set.mem_of_subset_of_mem subset_span
+    rw [Set.mem_image]
+    exact ⟨p, hp , rfl⟩  
+  ·    
+    intro hq
+    rw [mem_span_iff''] at hq
+    rcases hq with ⟨s, f, hs, hq⟩
+    rw [hq]
+    apply Ideal.sum_mem
+    intro m hm
+    apply Ideal.mul_mem_left
+    by_cases h : m = 0
+    ·simp [h]    
+    have hm := Set.mem_of_subset_of_mem hs hm
+    rw [Set.mem_image] at hm
+    rcases hm with ⟨p, hp, hm⟩
+    rw [←hm] at h
+    have : p.lm = C p.leading_coeff⁻¹ * p.leading_term := by
+      rw [leading_term_def', smul_eq_C_mul, ←mul_assoc, ←C_mul]
+      have := p.leading_coeff_eq_zero_iff.not.mpr (p.lm_eq_zero_iff.not.mp h)
+      rw [inv_mul_cancel this, C_1, one_mul]
+    rw [←hm, this]
+    apply Ideal.mul_mem_left
+    apply Set.mem_of_subset_of_mem subset_span
+    rw [Set.mem_image]
+    exact ⟨p, hp , rfl⟩
+
+lemma leading_term_ideal_span_monomial :
+  leading_term_ideal G'' =
+  span ((monomial · (1 : k)) '' ((G'' \ {0}).image (β:=σ→₀ℕ) multideg)) := by  
+  rw [leading_term_ideal_def, ←span_sdiff_singleton_zero_eq (lm '' G'')]
+  congr
+  have : lm '' G'' \ {0} = lm '' (G'' \ {0}) := by
+    have : {0} = lm⁻¹' ({0} : Set (MvPolynomial σ k)) := by
+      ext x
+      simp [lm_eq_zero_iff]
+    nth_rewrite 2 [this]
+    exact Set.image_diff_preimage.symm  
+  rw [this, Set.image_image]
+  apply Set.image_congr
+  simp
+  intro a _ ha
+  exact lm_def_of_ne_zero ha
+
+lemma rem_mem_ideal_iff {p : MvPolynomial σ k}
+  {G' : Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
+  {r : MvPolynomial σ k}
+  (h : G'.toSet ⊆ I) (hG' : is_rem p G' r):
+  r ∈ I ↔ p ∈ I := by  
+  constructor
+  · intro hr
+    rw [hG'.2.choose_spec.2]
+    exact add_mem (sum_mul_mem_of_subset' h _) hr
+  ·
+    intro hp
+    rw [←sub_eq_of_eq_add' (hG'.2.choose_spec.2)]
+    apply Ideal.sub_mem I hp
+    exact sum_mul_mem_of_subset' h hG'.2.choose
+
+lemma rem_sub_rem_mem_ideal {G' : Finset (MvPolynomial σ k)}
+  {I : Ideal (MvPolynomial σ k)} (hG' : G'.toSet ⊆ I)
+  {p r₁ r₂ : MvPolynomial σ k}
+  (hr₁ : is_rem p G' r₁) (hr₂ : is_rem p G' r₂) : r₁-r₂ ∈ I := by  
+  have h₁ := eq_sub_of_add_eq' hr₁.2.choose_spec.2.symm
+  have h₂ := eq_sub_of_add_eq' hr₂.2.choose_spec.2.symm  
+  rw [h₁, h₂]
+  simp
+  rw [←Finsupp.sum_sub_index _]
+  ·exact sum_mul_mem_of_subset' hG' _
+  · simp
+    intro a _ b₁ b₂
+    ring
+
+lemma monomial_not_mem_leading_term_ideal {r : MvPolynomial σ k}
+  {G' : Set (MvPolynomial σ k)}
+  (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
+: ∀ s ∈ r.support, monomial s 1 ∉ leading_term_ideal G' := by  
+  intro s hs
+  rw [leading_term_ideal_span_monomial, mem_ideal_span_monomial_image]
+  simp
+  intro g hg hg'
+  exact h g hg hg' s hs
+
+lemma term_not_mem_leading_term_ideal {r : MvPolynomial σ k}
+  {G' : Set (MvPolynomial σ k)}
+  (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
+: ∀ s ∈ r.support, monomial s (r.coeff s) ∉ leading_term_ideal G' := by  
+  intro s hs
+  have := monomial_not_mem_leading_term_ideal h s hs
+  by_contra h'
+  apply this
+  rw [(by simp [mem_support_iff.mp hs] : 1 =  (r.coeff s)⁻¹*(r.coeff s))]
+  rw [←C_mul_monomial]
+  exact mul_mem_left _ _ h'
+
+lemma not_mem_leading_term_ideal {r : MvPolynomial σ k}
+  {G' : Set (MvPolynomial σ k)}
+  (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
+  (hr : r ≠ 0) :
+r ∉ leading_term_ideal G' := by  
+  rw [leading_term_ideal_span_monomial, mem_ideal_span_monomial_image]
+  simp
+  use multideg r
+  constructor
+  · rw [←leading_coeff_def, leading_coeff_eq_zero_iff]
+    exact hr
+  ·
+    intro g hg hg'
+    exact h g hg hg' r.multideg (r.multideg_mem_support_iff_p_ne_zero.mpr hr)
+
+lemma rem_monomial_not_mem_leading_term_ideal {p r : MvPolynomial σ k}
+  {G' : Finset (MvPolynomial σ k)} (h : is_rem p G' r):
+  ∀ s ∈ r.support, monomial s 1 ∉ leading_term_ideal G'.toSet := by
+  exact monomial_not_mem_leading_term_ideal h.1
+
+lemma rem_term_not_mem_leading_term_ideal {p r : MvPolynomial σ k}
+  {G' : Finset (MvPolynomial σ k)} (h : is_rem p G' r):
+  ∀ s ∈ r.support, monomial s (r.coeff s) ∉ leading_term_ideal G' := by
+  exact term_not_mem_leading_term_ideal h.1
+
+lemma rem_not_mem_leading_term_ideal {p r : MvPolynomial σ k}
+  {G' : Finset (MvPolynomial σ k)} (h : is_rem p G' r) (hr :r ≠ 0):
+  r ∉ leading_term_ideal G' := by
+  exact not_mem_leading_term_ideal h.1 hr
+
+lemma rem_sub_rem_term_not_mem_leading_term_ideal
+  {G' : Finset (MvPolynomial σ k)} {p r₁ r₂ : MvPolynomial σ k}
+  (hr₁ : is_rem p G' r₁) (hr₂ : is_rem p G' r₂) :
+  ∀ s ∈ (r₁-r₂).support, monomial s ((r₁-r₂).coeff s) ∉ leading_term_ideal G'
+:= by  
+  apply term_not_mem_leading_term_ideal
+  intro g hg hg' s hs  
+  have := Set.mem_of_subset_of_mem (support_sub σ r₁ r₂) hs
+  simp [-mem_support_iff] at this  
+  cases' this with hs hs
+  ·exact hr₁.1 g hg hg' s hs
+  ·exact hr₂.1 g hg hg' s hs
+
+end Ideal
 
 end MvPolynomial
