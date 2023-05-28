@@ -44,6 +44,8 @@ variable {σ : Type _} {s : σ →₀ ℕ} {k : Type _} [Field k]
 variable [term_order_class: TermOrderClass (TermOrder (σ→₀ℕ))]
 variable (p: MvPolynomial σ k) (G: List (MvPolynomial σ k))
 
+set_option synthInstance.maxHeartbeats 40000
+
 noncomputable def step:
 (G.toFinset →₀ MvPolynomial σ k) × MvPolynomial σ k :=
   if p = 0 then ⟨0, 0⟩ else
@@ -86,19 +88,18 @@ lemma step_multideg_le:
       -- simp only [lt_neg, leading_term_1, leading_term_leading_term, one_mul, multideg_leading_term, ne_eq, le_refl]    
     ·-- simp? [hgs, hp]
       simp only [hp, ne_eq, hgs, dite_false, ite_false, le_refl]
+
 @[simp]
 lemma step_sub_multideg''_lt
   {p: MvPolynomial σ k} (G: List (MvPolynomial σ k)) (hp: p ≠ 0):
   multideg'' ((p.step G).2 - coeff p.multideg (p.step G).2•lm p) < multideg'' p
 := sub_multideg''_lt hp (step_multideg_le p G)
 
-
 @[simp]
 lemma step_zero: (0: MvPolynomial σ k).step G = ⟨0, 0⟩ := by
   rw [step_apply]
   simp only [zero_sub, ite_true]
 
--- @[simp]
 lemma ne_zero_of_step_quo_ne_zero (hp : (p.step G).2 ≠ 0) : p ≠ 0 := by
   by_contra h
   simp [h] at hp
@@ -422,7 +423,8 @@ theorem rem_support (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
     simp only [ne_eq, multideg_eq_zero_iff, not_exists, hp, rem_apply,
               dite_eq_ite, ite_false, mem_support_iff, coeff_add] at hs
     -- simp? only [coeff_smul] at hs
-    set_option synthInstance.etaExperiment true in rw [coeff_smul] at hs
+    -- set_option synthInstance.etaExperiment true in 
+    rw [coeff_smul] at hs
     -- simp? at hs
     rw [smul_eq_mul] at hs    
     have hnext := rem_support
