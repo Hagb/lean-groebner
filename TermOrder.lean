@@ -109,18 +109,6 @@ instance ZeroLEClass.toOrderBot [Zero β] [LE β] [ZeroLEClass β]: OrderBot β 
 lemma zero_le''' [Zero β] [LE β] [ZeroLEClass β] (a: β) : 0 ≤ a :=
   ZeroLEClass.zero_le a
 
--- instance TermOrder.toOrderBot: OrderBot β := 
-
--- instance:
---   CovariantClass β β (·+·) (·≤·) := inferInstance
-
--- instance:
---   ContravariantClass β β (·+·) (·<·) := inferInstance
-    -- contravariant_add_lt_of_covariant_add_le β
-
--- instance:
---   CovariantClass β β (·+·) (·<·) := inferInstance
-    -- AddLeftCancelSemigroup.covariant_add_lt_of_covariant_add_le (N:=β)
 variable [AddCancelCommMonoid β]
 variable [LinearOrder β] [ZeroLEClass β] [IsWellOrder β (·<·)]
 variable [CovariantClass β β (·+·) (·≤·)]
@@ -131,34 +119,6 @@ class TermOrderClass (β : Type _) [AddCancelCommMonoid β]
           IsWellOrder β (·<·),
           CovariantClass β β (·+·) (·≤·)
 
-
--- instance : WellFoundedRelation β := inferInstance
--- instance : PartialOrder β := inferInstance
--- instance : AddCommMonoid β := inferInstance
--- instance : PartialOrder β := inferInstance
--- instance : OrderedAddCommMonoid β := inferInstance
--- instance : Bot β := inferInstance
-
--- instance : CanonicallyOrderedAddMonoid β := {
---   bot_le := ZeroLEClass.zero_le
---   exists_add_of_le := by
-
--- }
-
-
-variable {σ: Type _} [TermOrderClass (TermOrder (σ→₀ℕ))] {k₁ k₂: σ→₀ℕ}
-
--- private instance test₂ : LinearOrder (σ→₀ℕ) := tc.toLinearOrder
-
--- def test : CommMonoid (σ→₀ℕ) := {
-
--- }
-
--- instance : ZeroLEClass (σ→₀ℕ) := {
---   zero_le := by
---     intros a
-
--- }
 
 lemma TermOrder.le_of_finsupp_le (h: k₁≤k₂): LE.le (α:=TermOrder (σ→₀ℕ)) k₁ k₂
   := by  

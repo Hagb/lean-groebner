@@ -1,5 +1,3 @@
-
-
 import Mathlib.RingTheory.Polynomial.Basic
 import Mathlib.RingTheory.MvPolynomial.Ideal
 import Mathlib.RingTheory.Ideal.Basic

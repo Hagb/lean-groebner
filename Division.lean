@@ -3,12 +3,6 @@ import Mathlib.Data.MvPolynomial.Basic
 import Mathlib.Data.MvPolynomial.Division
 import Mathlib.Data.MvPolynomial.CommRing
 import Mathlib.Algebra.BigOperators.Basic
--- import Mathlib.Algebra.BigOperators.Ring
--- import Mathlib.Algebra.Module.Submodule.Basic
--- import Mathlib.RingTheory.Ideal.Basic
--- import Mathlib.LinearAlgebra.Finsupp
--- import Mathlib.LinearAlgebra.Span
-
 import Mathlib.Data.Finset.Basic
 import Mathlib.Data.Finset.Sum
 import Mathlib.Data.Finset.Lattice
@@ -17,11 +11,9 @@ import Mathlib.Data.Finsupp.Order
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.LibrarySearch
 import Mathlib.Data.List.Basic
--- import Mathlib.Data.List.ProdSigma
 import Mathlib.RingTheory.Polynomial.Basic
 
 import Basic
--- import Ideal
 import TermOrder
 import Multideg
 
@@ -111,23 +103,6 @@ lemma ne_zero_of_step_quo_ne_zero (hp : (p.step G).2 ≠ 0) : p ≠ 0 := by
   by_contra h
   simp [h] at hp
 
--- lemma step_quo_dvd
---   (h : p≠0) (hg : ∃ g ∈ G, leading_term g∣ leading_term p):
---   (G.filter (leading_term ·∣ leading_term p)).head!.leading_term ∣
---   p.leading_term := sorry
-
-
--- lemma step_quo_ne_zero''
---   (h : p≠0) (hg : ∃ g ∈ G, leading_term g∣ leading_term p) :
---   (G.filter (leading_term ·∣ leading_term p)).head! ≠ 0 := by
---   let gs := G.filter (leading_term ·∣ leading_term p)
---   have : gs ≠ [] := List.filter_ne_nil'.mpr hg
---   by_contra h'
---   sorry
-
--- lemma step_quo_dvd_choose
---   (h : p≠0) (hg : ∃ g ∈ G, leading_term g∣ leading_term p):
---   (step_quo_dvd p G h hg).choose ≠ 0 := sorry
 @[simp]
 lemma step_sub_multideg_le
   {p: MvPolynomial σ k} (G: List (MvPolynomial σ k)):
@@ -507,88 +482,6 @@ lemma rem_is_rem' : is_rem p G' (p.rem G'.toList) := by
 theorem exists_rem : ∃ r : MvPolynomial σ k, is_rem p G' r := by  
   use p.rem G'.toList
   simp only [rem_is_rem']
-
--- lemma step_rem (p: MvPolynomial σ k) (G: List (MvPolynomial σ k)):
---   ((p.rem G).step G).2 = p.rem G := by
---   rw [rem_apply, step_apply]
---   by_cases h: (p.mv_div G).snd = 0
---   ·
---     -- simp? [h]
---     simp only [h, zero_sub, ite_true]
---   ·
---     -- simp? [h]
---     simp only [h, ne_eq, ite_false]
---     by_cases h₂ : ∃ g, g ∈ G ∧ leading_term g ∣ leading_term (mv_div p G).snd
---     ·
---       -- simp? [h, h₂]
---       simp only [h₂, dite_true, sub_eq_self, mul_eq_zero, ne_eq]
---       generalize_proofs h h'
---       by_cases hh' : h'.choose = 0
---       ·
---         right
---         exact hh'
---       left
---       have test := h₂.choose_spec
---       have test1 := h'.choose_spec
---       -- conv => enter [1,1,1,1,x]; rw [test1]
-
---       sorry
---     ·
---       -- simp? [h, h₂]
---       simp only [h₂, dite_false]
-
-
--- #check le_trans
--- #check mul_add
--- #check coeff_ne_zero
--- #check rem_support
--- lemma testttt (h : p=0 ∧ q=0): False := by
---   Decidable.byContradiction
---   cases' h with h1 h2
---   ring
--- #check not_not
--- #check div_diviso
-
--- example [CommRing L] [CommRing (MvPolynomial σ L)] (p a b c: (MvPolynomial σ L)): p - a + (a - c - b) - (p - (b + c)) = 0 := by
---   ring
-
--- example [CommRing J] (p a b c: J): p - a + (a - c - b) - (p - (b + c)) = 0 := by
---   ring
--- set_option maxHeartbeats
--- lemma reg_dvd : ∀ g ∈ G, ∀ rs ∈ (reg p G).support, lt g ∣ monomial rs 1 := by
---   intros g hg rs hrs
---   -- unfold Reg at hrs
---   sorry
--- instance : NonAssocSemiring k := CommRing.toCommSemiring.toSemiring.toNonAssocSemiring
--- theorem reg_iff (r: MvPolynomial σ k): r = reg p G ↔ isReg p G r:= by
---   constructor
---   ·
---     intro hr
---     rw [hr]
---     unfold isReg
---     -- constructor
---     -- ·
---     --   unfold Reg
---     --   intros g hg rs hrs
---     --   -- unfold Reg'
---     --   simp at hrs
---     --   by_cases hp: p=0
---     --   ·
-
---     sorry
---   sorry
-
-
--- theorem reg_unique: ∃! (r: MvPolynomial σ k), isReg p G r := by
---   use reg p G
---   constructor
---   ·
---     simp only
---     rw [←reg_iff]
---   ·
---     simp only
---     intro r' hr'
---     exact (reg_iff p G r').mpr hr'
 
 end MvDiv
 

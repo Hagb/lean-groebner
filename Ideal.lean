@@ -1,6 +1,4 @@
-
 import Mathlib.Data.MvPolynomial.Basic
--- import Mathlib.Data.MvPolynomial.Division
 import Mathlib.Data.MvPolynomial.CommRing
 import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Algebra.BigOperators.Ring
@@ -11,19 +9,11 @@ import Mathlib.LinearAlgebra.Finsupp
 import Mathlib.LinearAlgebra.Span
 import Mathlib.Data.Finset.Basic
 import Mathlib.Data.Finset.Sum
--- import Mathlib.Data.Finset.Prod
 import Mathlib.Data.Finsupp.Basic
--- import Mathlib.Data.Finsupp.Defs
--- import Mathlib.Data.Finsupp.Order
--- import Mathlib.Data.Finsupp.WellFounded
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.LibrarySearch
 import Mathlib.Tactic.Substs
--- import Mathlib.Data.List.Basic
--- import Mathlib.Data.List.ProdSigma
 import Mathlib.RingTheory.Polynomial.Basic
--- import Mathlib.Order.WellFounded
--- import TermOrder
 import Division
 
 open BigOperators

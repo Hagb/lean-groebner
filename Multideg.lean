@@ -1,4 +1,3 @@
-
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Data.MvPolynomial.Basic
 import Mathlib.Data.MvPolynomial.CommRing
@@ -183,24 +182,6 @@ lemma le_multideg'_of_coeff_ne_zero
   s ≤ multideg' p p_ne_zero :=
   multideg'_eq_multideg p_ne_zero ▸ le_multideg_of_coeff_ne_zero h
 
-  -- apply coeff_eq_zero_of_multideg_lt (p:=p)
-   --coeff_eq_zero_of_multideg_lt]
-
-
--- noncomputable def ltOfSet (S: Set (MvPolynomial σ R)): Set (MvPolynomial σ R) :=
---   { ltp | ∃ p ∈ S, ltp = leading_term p }
-
--- noncomputable def ltOfFinset (S: Finset (MvPolynomial σ R)): Finset (MvPolynomial σ R) :=
---   S.filter (∃ p ∈ S, · = leading_term p)
-
--- noncomputable def supportListOfPoly (p: MvPolynomial σ R): List (TermOrder (σ→₀ℕ)) :=
---   p.support.sort LE.le
-
--- noncomputable def ltOfIdeal (I : Ideal (MvPolynomial σ R)): Ideal (MvPolynomial σ R) :=
---   Ideal.span (ltOfSet I)
--- #align mv_polynomial.leading_term_of_ideal MvPolynomial.ltOfIdeal
-
-
 lemma multideg'_in_support: multideg' p p_ne_zero ∈ p.support :=
   (show Finset (TermOrder (σ→₀ℕ)) from p.support).max'_mem _
 #align mv_polynomial.multideg'_in_support MvPolynomial.multideg'_in_support
@@ -308,9 +289,6 @@ lemma leading_term_def:
     -- simp? [hp, multideg'_eq_multideg, leading_term, leading_coeff]
     simp only [leading_term, ne_eq, hp, not_false_eq_true,
                 multideg'_eq_multideg, dite_eq_ite, ite_true, leading_coeff]
-
--- noncomputable def lmOfFinset (S: Finset (MvPolynomial σ R)): Finset (MvPolynomial σ R) :=
---   S.filter (∃ p ∈ S, · = lm p)
 
 lemma leading_term_def' :
   p.leading_term = p.leading_coeff • p.lm := by
@@ -539,13 +517,6 @@ lemma leading_term_1 : leading_term (1 : MvPolynomial σ R) = 1 := by
   simp [leading_term_def]
   rfl
 
--- noncomputable instance leading_coeffZeroHom: ZeroHom (MvPolynomial σ R) R :=
--- {
---   toFun := leading_coeff
---   map_zero' := by rw [leading_coeff]; simp
--- }
-
--- 没注意到无零因子
 lemma lm_mul [NoZeroDivisors R]: lm (p * q) = lm p * lm q := by
   by_cases hpq: p * q = 0
   ·
@@ -564,34 +535,6 @@ lemma lm_1 : lm (1 : MvPolynomial σ R) = 1 := by
   · simp [h]
   · simp [h]
     rfl
-
--- lemma lm_mul [NoZeroDivisors R]: lm (p * q) = lm p * lm q := by
---   rw [lm, lm, lm]
---   by_cases hpq: p * q = 0
---   ·
---     -- simp? at hpq
---     simp only [mul_eq_zero, ne_eq] at hpq
---     -- simp? [hpq]
---     simp only [ne_eq, mul_eq_zero, hpq, not_true, dite_false, dite_not,
---               zero_eq_mul, dite_eq_left_iff, monomial_eq_zero]
---     by_cases nontrival : Nontrivial R
---     ·
---       -- simp? [imp_false, nontrival, hpq]
---       simp only [ne_eq, one_ne_zero, imp_false, not_not, hpq]
---     ·
---       left
---       intro _
---       have := nontrivial_iff.not.mp nontrival
---       push_neg at this
---       exact this 1 0
---   ·
---     -- simp? at hpq
---     simp only [mul_eq_zero, ne_eq] at hpq
---     push_neg at hpq
---     -- simp? [hpq, monomial_eq_monomial_iff, multideg'_mul]
---     simp only [ne_eq, mul_eq_zero, hpq, or_self, not_false_eq_true,
---         multideg'_mul, dite_eq_ite, ite_true, dite_true, monomial_mul, mul_one]
-  
 
 lemma leading_term_mul [NoZeroDivisors R]:
   leading_term (p * q) = leading_term p * leading_term q := by
@@ -688,30 +631,6 @@ theorem multideg_add_le: multideg (p+q) ≤ max p.multideg q.multideg := by
     simp only [ne_eq, not_le] at h
     exact multideg_add_le_left (le_of_lt h)
 
--- lemma multideg_add_leading_term_right
---   {p q: MvPolynomial σ R} (h: leading_term p + leading_term q =0) (h': q ≠ 0):
---   multideg (p + q) < multideg q := by
---   rw [leading_term_def, leading_term_def] at h
---   rw
-  
-
-
--- lemma multideg_add_leading_term_right'
---   {p q: MvPolynomial σ R} (h: leading_term p + leading_term q =0) (h': p ≠ 0):
---   multideg (p + q) < multideg q := by
---   sorry
-
--- lemma multideg_add_leading_term_left
---   {p q: MvPolynomial σ R} (h: leading_term p + leading_term q =0) (h': q ≠ 0):
---   multideg (p + q) < multideg p := by
---   sorry
-
--- lemma multideg_add_leading_term_left'
---   {p q: MvPolynomial σ R} (h: leading_term p + leading_term q =0) (h': p ≠ 0):
---   multideg (p + q) < multideg p := by
---   sorry
--- lemma multideg_add_leading_term (h: leading_term p + leading_term q = 0) (h': p ≠ 0 ∨ q ≠ 0) := by
---   sorry
 lemma multideg_add_eq_right
     {p q: MvPolynomial σ R} (h: multideg p < multideg q):
   multideg (p+q) = multideg q := by  
@@ -737,12 +656,6 @@ lemma multideg_add_eq_left
     {p q: MvPolynomial σ R} (h: multideg q < multideg p):
   multideg (p+q) = multideg p :=
   add_comm p q ▸ multideg_add_eq_right h
-
--- lemma multideg_add_eq (h: multideg p ≠ multideg q):
---   multideg (p+q) = max p.multideg q.multideg := by
---   --  ne_iff_lt_or_gt.mp h
---   sorry
--- set_option synthInstance.etaExperiment true in
 
 -- TODO: mathlib
 theorem monomial_add {s : σ →₀ ℕ} {a b : R} :
@@ -783,104 +696,6 @@ lemma multideg_add_lt_left_iff (h : q.multideg ≤ p.multideg)
       have hq := hpq.symm ▸ coeff_zero q.multideg
       simp [hpq''] at hq
       simp [hp, hq] at h₂
--- lemma multideg_add_ne_left_iff (h : q.multideg ≤ p.multideg)
---   (h₂: p + q ≠ 0):
-
--- variable (p: MvPolynomial σ R) (s: TermOrder (σ→₀ℕ))
-
--- noncomputable def split_le: MvPolynomial σ R :=
---   p.filter (α:=TermOrder (σ →₀ ℕ)) (·≤s)
-
--- noncomputable def split_gt: MvPolynomial σ R :=
---   p.filter (α:=TermOrder (σ →₀ ℕ)) (s<·)
-
-
--- lemma split_le_apply: p.split_le s = p.filter (·≤s) := rfl
-
--- lemma split_gt_apply: p.split_gt s = p.filter (s<·) := rfl
-
--- lemma split_le_def': p.split_le s = 
---   (p.support.filter (·≤s)).sum fun s' => monomial s' (p.coeff s') := by
---   nth_rewrite 1 [split_le_apply, Finsupp.filter_eq_sum]
---   rfl
-
--- lemma split_gt_def': p.split_gt s = 
---   (p.support.filter (s<·)).sum fun s' => monomial s' (p.coeff s') := by
---   nth_rewrite 1 [split_gt_apply, Finsupp.filter_eq_sum]
---   rfl
-
--- lemma split_le_add_split_gt
---   (p: MvPolynomial σ R) (s: TermOrder (σ→₀ℕ)): p.split_le s + p.split_gt s = p
---   := by
---   rw [split_le_def', split_gt_def']
---   conv_rhs => rw [as_sum p]
---   simp_rw [lt_iff_not_ge]
---   rw [Finset.sum_filter_add_sum_filter_not]
---   rfl
-
--- lemma support_split_le: (p.split_le s).support = p.support.filter (·≤s) := by
---   rw [split_le_def']
---   ext a
---   -- simp?
---   -- rw [coeff_sum]
---   -- simp only [coeff_monomial]
---   simp only [mem_support_iff, ne_eq, mem_filter, coeff_sum, coeff_monomial]
---   let supp := filter (fun x => x ≤ s) (support p)
---   have key := sum_ite_eq' (α:=TermOrder (σ→₀ℕ)) supp a (coeff · p)
---   have eq_is_eq: ∀ (x: TermOrder (σ→₀ℕ)), x = a ↔ @Eq (σ→₀ℕ) x a := by
---     intros x; rfl
---   simp_rw [eq_is_eq] at key
---   rw [key]
---   by_cases hs: @LE.le (TermOrder (σ→₀ℕ)) _ a s
---   ·
---     simp only [mem_filter, hs, and_true, ite_eq_right_iff, not_forall,
---               mem_support_iff.symm, exists_prop, and_self]
---   ·
---     -- simp? [hs]
---     simp only [mem_filter, hs, and_false, ite_false, not_true]
-
--- lemma split_le_eq_self_iff: p.split_le s = p ↔ p.multideg ≤ s := by
---   sorry
-
--- lemma multideg_split_le_eq_self_iff:
---   multideg (p.split_le s) = multideg p ↔ p.multideg ≤ s := by
---   sorry
-
--- @[simp]
--- lemma add_split_le (p q: MvPolynomial σ R):
---   (p+q).split_le s = p.split_le s + q.split_le s := by
---   simp_rw [split_le_apply]
---   rw [Finsupp.filter_add]
-
--- @[simp]
--- lemma add_split_gt (p q: MvPolynomial σ R):
---   (p+q).split_gt s = p.split_gt s + q.split_gt s := by
---   -- exact 
---   simp_rw [split_gt_apply]
---   rw [Finsupp.filter_add]
-
--- noncomputable
--- instance split_le_AddHom: MvPolynomial σ R →+ MvPolynomial σ R :=
--- {
---   toFun := fun p => p.split_le s,
---   map_zero' := by simp [split_le_def'],
---   map_add' := by intros x y; simp [add_split_le]
--- }
-
--- noncomputable
--- instance split_gt_AddHom: MvPolynomial σ R →+ MvPolynomial σ R :=
--- {
---   toFun := fun p => p.split_gt s,
---   map_zero' := by simp [split_gt_def'],
---   map_add' := by intros x y; simp [add_split_gt]
--- }
-
--- lemma multideg_split_le_le (p: MvPolynomial σ R) (s: TermOrder (σ→₀ℕ)):
---   (p.split_le s).multideg ≤ s := by
---   rw [multideg_apply, support_split_le]
---   -- simp?
---   simp only [Finset.sup_le_iff, mem_filter, id_eq, and_imp, imp_self,
---             implies_true, forall_const]
 
 lemma coeff_multideg'_ne_zero : p.coeff (p.multideg' p_ne_zero) ≠ 0 :=
 mem_support_iff.mp (multideg'_in_support p p_ne_zero)
@@ -899,10 +714,6 @@ by
 @[simp]
 lemma leading_coeff_monomial : leading_coeff (monomial s a) = a := by
   by_cases ha : a = 0 <;> simp [leading_coeff_def, multideg_monomial, ha]
-
--- @[simp]
--- lemma coeff_multideg_eq_zero_iff : p.coeff p.multideg = 0 ↔ p = 0 :=
--- leading_coeff_def p ▸ leading_coeff_eq_zero_iff p
 
 
 @[simp] lemma multideg_leading_term : p.leading_term.multideg = p.multideg :=
@@ -949,26 +760,15 @@ lemma leading_term_mul'_right [NoZeroDivisors R]:
   (p * q).leading_term = (p.leading_term * q).leading_term := by
   rw [leading_term_mul, leading_term_mul, leading_term_leading_term]
 
-
 lemma leading_term_mul'_left [NoZeroDivisors R]:
   (p * q).leading_term = (p * q.leading_term).leading_term := by
   rw [leading_term_mul, leading_term_mul, leading_term_leading_term]
-
--- @[simp] lemma
 
 variable {R : Type _} [CommRing R] (p q : MvPolynomial σ R)
 
 @[simp] lemma multideg_neg : (-p).multideg = p.multideg := by
   rw [multideg, multideg]
   simp only [support_neg]
-
--- @[simp] lemma leading_coeff_neg : (-p).leading_coeff = - p.leading_coeff := by
---   rw [leading_coeff_def]
---   simp [←leading_coeff_def]
-
--- @[simp] lemma leading_term_neg : (-p).leading_term = - p.leading_term := by
---   rw [leading_term_def]
---   simp [←leading_term_def]
 
 @[simp] lemma leading_coeff_neg : (-p).leading_coeff = -p.leading_coeff := by
   -- simp? [leading_coeff_def]
@@ -994,6 +794,7 @@ lemma multideg_sub_lt_left_iff
   simp only [lm._eq_1, ne_eq, multideg_eq_zero_iff, not_exists, h,
               not_false_eq_true, multideg'_eq_multideg, dite_eq_ite,
               ite_true, coeff_monomial]
+
 @[simp]
 lemma sub_multideg_le [CommRing R₁] {p q: MvPolynomial σ R₁}
   (h: multideg q ≤ multideg p) :
@@ -1010,6 +811,7 @@ lemma sub_multideg_le [CommRing R₁] {p q: MvPolynomial σ R₁}
     refine le_trans multideg_mul_le ?_
     -- simp? [multideg_lm]
     simp only [multideg_C, multideg_lm, zero_add, le_refl]
+
 @[simp]
 lemma sub_multideg_lt [CommRing R₁] {p q: MvPolynomial σ R₁} (hp: p ≠ 0)
   (h: multideg q ≤ multideg p) :

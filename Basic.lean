@@ -1,10 +1,8 @@
-
 import Mathlib.Data.MvPolynomial.Basic
 import Mathlib.Algebra.Hom.Embedding
 import Mathlib.Algebra.MonoidAlgebra.Support
 import Mathlib.Data.Finset.Basic
 import Mathlib.Data.Finset.Image
--- import Mathlib.Tactic.LibrarySearch
 
 namespace MvPolynomial
 variable {σ : Type _} {a a' a₁ a₂ : R} [CommSemiring R]
@@ -55,6 +53,7 @@ theorem support_mul_monomial:
       simp [Finset.image_image, addRightEmbedding]
   simp [monomial_eq_monomial_iff, ha] at hkey'
   exact (hkey'.1 ▸ hkey'.2 ▸ hkey) ha
+
 @[simp]
 theorem support_monomial_mul :
     ((monomial s a) * p).support = p.support.map (addLeftEmbedding s) := by  
