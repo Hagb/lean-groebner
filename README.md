@@ -21,9 +21,9 @@ Mainly based on the book [_Ideals, Varieties, and Algorithms_](https://link.spri
 
 (`rem_is_rem` and `exists_rem`) With a term order defined, such a multivariable $r\in k[x_i:x\in\sigma]$ exists for every multivariable $p$ and $G'$ a finite set of multivariable:
 
-- for every $g\in G'\backslash\{0\}$, $\text{the leading term of} g \not| \text{every terms of} s$;
+- for every $g\in G'\backslash\\{0\\}$, any terms of $s$ is not divisible by the leading term of $g$;
 - such a function $q:G'\rightarrow k[x_i:x\in\sigma]$ exists:
-    - for every $g\in G'$. $\operatorname{multideg}(q(g)g)\le\operatorname{multideg}(p)$,
+    - for every $g\in G'$. $\text{multideg}(q(g)g)\le\text{multideg}(p)$,
     - $p=\sum_{g\in G'}q(g)g+r$.
 
 I prove this statement by definition the division algorithm (`mv_div`, `quo`, `rem`) and proving its properties.
