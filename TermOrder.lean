@@ -119,6 +119,8 @@ class TermOrderClass (β : Type _) [AddCancelCommMonoid β]
           IsWellOrder β (·<·),
           CovariantClass β β (·+·) (·≤·)
 
+variable {σ: Type _} [TermOrderClass (TermOrder (σ→₀ℕ))] {k₁ k₂: σ→₀ℕ}
+
 
 lemma TermOrder.le_of_finsupp_le (h: k₁≤k₂): LE.le (α:=TermOrder (σ→₀ℕ)) k₁ k₂
   := by  
