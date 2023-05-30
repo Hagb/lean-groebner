@@ -108,7 +108,7 @@ jobs:
       - name: get cache
         run: lake exe cache get
 
-      - name: build mathlib
+      - name: build
         uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: gcc
