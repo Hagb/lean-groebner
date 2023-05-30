@@ -2,7 +2,7 @@
 
 (sorry for my bad English and bad math)
 
-I am learning computational algebraic geometry, and have formalized Gröbner basis (and other things it needs) of multivariable in [Lean 4](https://leanprover.github.io).
+I am learning computational algebraic geometry, and have formalized Gröbner basis (and other things it needs) of multivariate polynomial in [Lean 4](https://leanprover.github.io).
 
 Mainly based on the book [_Ideals, Varieties, and Algorithms_](https://link.springer.com/book/10.1007/978-3-319-16721-3).
 
@@ -12,14 +12,14 @@ Mainly based on the book [_Ideals, Varieties, and Algorithms_](https://link.spri
 - `multideg`, `multideg'`, `multideg''` ([`Multideg.lean`](./Multideg.lean)): multidegree
 - `leading_coeff`, `leading_term`, `lm` ([`Multideg.lean`](./Multideg.lean)): leading coeff, leading term and leading monomial
 - `quo`, `rem`, `is_rem` ([`Division.lean`](./Division.lean)): the the quotient and the remainder of division with remainder
-- `leading_term_ideal` ([`Ideal.lean`](./Ideal.lean)): the ideal span of leading terms of a set of multivariables.
+- `leading_term_ideal` ([`Ideal.lean`](./Ideal.lean)): the ideal span of leading terms of a set of multivariate polynomial.
 - `is_groebner_basis` ([`Groebner.lean`](./Groebner.lean)): a finite set is a Gröbner basis of a ideal
 
 ## Main statements
 
 ### [`Division.lean`](./Division.lean)
 
-(`rem_is_rem` and `exists_rem`) With a term order defined, such a multivariable $r\in k[x_i:x\in\sigma]$ exists for every multivariable $p$ and $G'$ a finite set of multivariable:
+(`rem_is_rem` and `exists_rem`) With a term order defined, such a multivariable polynomial $r\in k[x_i:x\in\sigma]$ exists for every multivariable polynomial $p$ and $G'$ a finite set of multivariable polynomial:
 
 - for every $g\in G'\backslash\\{0\\}$, any terms of $s$ is not divisible by the leading term of $g$;
 - such a function $q:G'\rightarrow k[x_i:x\in\sigma]$ exists:
