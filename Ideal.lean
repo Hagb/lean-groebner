@@ -152,14 +152,14 @@ theorem mem_span_iff'' (A : Set R) (p : R) :
     simp
 
 theorem fg_span_iff_fg_span_finset_subset (s : Set R) :
-  (span s).Fg ↔ ∃ (s' : Finset R), s'.toSet ⊆ s ∧ span s = span s' := by
+  (span s).FG ↔ ∃ (s' : Finset R), s'.toSet ⊆ s ∧ span s = span s' := by
   constructor
   ·
     intro hfg
     let ⟨s₁, hs₁⟩ := hfg
     have := subset_span (α:=R) (s:=s₁)
     rw [hs₁] at this
-    let s' := s₁.bunionᵢ
+    let s' := s₁.biUnion
       (fun x =>
         if h : x ∈ s₁
           then ((mem_span_iff s x).mp (Set.mem_of_subset_of_mem this h)).choose.image (fun (x : s) => (↑x : R))
@@ -204,7 +204,7 @@ theorem fg_span_iff_fg_span_finset_subset (s : Set R) :
         refine Set.mem_of_subset_of_mem ?_ key
         apply span_mono
         rw [Finset.coe_subset]
-        apply Finset.subset_bunionᵢ_of_mem (x:=b) _
+        apply Finset.subset_biUnion_of_mem (x:=b) _
         exact hb
       ·
         apply span_mono
@@ -266,6 +266,8 @@ end Ideal
 open Ideal
 
 namespace MvPolynomial
+
+set_option synthInstance.maxHeartbeats 40000
 
 -- These section is abandoned,
 -- becasuse the equivalent things have committed to Mathlib

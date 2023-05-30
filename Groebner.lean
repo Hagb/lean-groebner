@@ -20,7 +20,7 @@ variable {σ : Type _} {s : σ →₀ ℕ} {k : Type _} [Field k]
 variable [term_order_class: TermOrderClass (TermOrder (σ→₀ℕ))]
 variable (p : MvPolynomial σ k)
 variable (G': Finset (MvPolynomial σ k)) (I : Ideal (MvPolynomial σ k))
-
+set_option synthInstance.maxHeartbeats 40000
 
 def is_groebner_basis :=
   G'.toSet ⊆ I ∧ leading_term_ideal I = leading_term_ideal G'.toSet
@@ -28,7 +28,7 @@ def is_groebner_basis :=
 theorem exists_groebner_basis [Finite σ] :
   ∃ G' : Finset (MvPolynomial σ k), is_groebner_basis G' I := by  
   let ltideal : Ideal (MvPolynomial σ k) := leading_term_ideal I
-  have key : Ideal.Fg ltideal := (inferInstance : IsNoetherian _ _).noetherian _
+  have key : Ideal.FG ltideal := (inferInstance : IsNoetherian _ _).noetherian _
   simp only [leading_term_ideal] at key  
   rw [Ideal.fg_span_iff_fg_span_finset_subset] at key
   rcases key with ⟨s, hs, h⟩

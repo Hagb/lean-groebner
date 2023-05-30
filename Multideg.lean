@@ -31,7 +31,7 @@ def multideg: TermOrder (σ →₀ ℕ) :=
 
 def multideg' : TermOrder (σ →₀ ℕ) :=
 p.support.max' (α:=TermOrder (σ→₀ℕ))
-(Finset.nonempty_of_ne_empty (p.support_eq_empty.not.mpr p_ne_zero))
+(Finset.nonempty_of_ne_empty (support_eq_empty.not.mpr p_ne_zero))
 -- #align mv_polynomial.multideg' MvPolynomial.multideg'
 
 def multideg'' : WithBot (TermOrder (σ→₀ℕ)) :=
@@ -67,7 +67,7 @@ multideg p = p.support.sup (α:=TermOrder (σ→₀ℕ)) (β:=TermOrder (σ→�
 
 lemma multideg'_apply :
 multideg' p p_ne_zero = p.support.max' (α:=TermOrder (σ→₀ℕ))
-(Finset.nonempty_of_ne_empty (p.support_eq_empty.not.mpr p_ne_zero)) := rfl
+(Finset.nonempty_of_ne_empty (support_eq_empty.not.mpr p_ne_zero)) := rfl
 
 lemma multideg''_apply :
   p.multideg'' = p.support.max (α:=TermOrder (σ→₀ℕ)) := rfl
@@ -105,7 +105,7 @@ lemma multideg_zero: multideg (0 : MvPolynomial σ R) = 0 := rfl
 @[simp]
 lemma multideg''_zero : multideg'' (0 : MvPolynomial σ R) = ⊥ := by
   unfold multideg''
-  rw [(0 : MvPolynomial σ R).support_eq_empty.mpr (rfl), max_empty]
+  rw [support_eq_empty.mpr (rfl), max_empty]
 
 @[simp]
 lemma multideg_C: multideg (C a: MvPolynomial σ R) = 0 := by
@@ -198,7 +198,7 @@ lemma multideg_mem_support_iff_p_ne_zero :
   constructor
   ·
     intro h
-    exact p.support_eq_empty.not.mp (Finset.ne_empty_of_mem h)
+    exact support_eq_empty.not.mp (Finset.ne_empty_of_mem h)
   ·
     intro h
     rw [←multideg'_eq_multideg h]
@@ -308,7 +308,7 @@ lemma leading_coeff_smul_lm_eq_leading_term:
   ·
     -- simp? [hp]
     simp only [ne_eq, hp, not_false_iff, dite_true]
-    rw [smul_monomial, mul_one]
+    rw [smul_monomial, smul_eq_mul, mul_one]
 
 
 lemma lm_eq_zero_iff: lm p = 0 ↔ p = 0 := by
@@ -355,14 +355,14 @@ theorem multideg'_mul_le (pq_ne_zero: p * q ≠ 0):
       (multideg' p (ne_zero_and_ne_zero_of_mul pq_ne_zero).1) +
       (multideg' q (ne_zero_and_ne_zero_of_mul pq_ne_zero).2) := by  
   have pqsup_nonempty :=
-    Finset.nonempty_of_ne_empty ((support_eq_empty (p * q)).not.mpr pq_ne_zero)
+    Finset.nonempty_of_ne_empty (support_eq_empty.not.mpr pq_ne_zero)
   unfold multideg'
   have mul_sup := support_mul p q
   have h :=
     mem_of_subset mul_sup (max'_mem (α:=TermOrder (σ→₀ℕ)) _ pqsup_nonempty)  
-  rw [Finset.mem_bunionᵢ] at h
+  rw [Finset.mem_biUnion] at h
   rcases h with ⟨a, ha, h⟩
-  rw [Finset.mem_bunionᵢ] at h
+  rw [Finset.mem_biUnion] at h
   rcases h with ⟨b, hb, h⟩
   rw [Finset.mem_singleton] at h
   rw [h]  
@@ -465,7 +465,7 @@ lemma multideg_eq_zero_iff: multideg q = 0 ↔ ∃ c : R, q = C c := by
     intros hq
     rw [multideg_apply, ] at hq
     -- rw [zero_le'''] at this
-    have := (sup_eq_bot_iff (α:=TermOrder (σ→₀ℕ)) id q.support).mp hq
+    have := (Finset.sup_eq_bot_iff (α:=TermOrder (σ→₀ℕ)) id q.support).mp hq
     by_cases hq' : q.support.Nonempty
     ·
       have : q.support = {0} :=
@@ -483,6 +483,7 @@ lemma multideg_eq_zero_iff: multideg q = 0 ↔ ∃ c : R, q = C c := by
     rintro ⟨c, hq⟩
     -- simp? [hq]
     simp only [hq, multideg_C]
+
 @[simp]
 lemma leading_coeff_mul [NoZeroDivisors R]:
   leading_coeff (p * q) = leading_coeff p * leading_coeff q := by  
@@ -826,11 +827,7 @@ lemma sub_multideg_lt [CommRing R₁] {p q: MvPolynomial σ R₁} (hp: p ≠ 0)
     apply lt_of_le_of_ne (sub_multideg_le h)
     by_contra hp'
     rw [←(leading_coeff_eq_zero_iff _).not, leading_coeff_def, hp'] at h'
-    -- set_option synthInstance.etaExperiment true in simp? [hp] at
-    set_option synthInstance.etaExperiment true in
-    simp only [coeff_sub, coeff_smul, ne_eq, multideg_eq_zero_iff, not_exists,
-              hp, not_false_eq_true, coeff_lm_of_ne_zero, smul_eq_mul, mul_one,
-              sub_self, not_true] at h'
+    simp [hp] at h'
 
 
 @[simp]
