@@ -8,11 +8,14 @@ namespace MvPolynomial
 variable {σ : Type _} {a a' a₁ a₂ : R} [CommSemiring R]
 variable {n m : σ} {s : σ →₀ ℕ}
 variable (p: MvPolynomial σ R)
+
+-- Has been submitted to Mathlib/Mathlib4
 @[simp]
 lemma smul_monomial': a • monomial s a' = monomial s (a * a') := by  
   rw [smul_eq_C_mul, C_mul_monomial]
   -- exact (smul_eq_C_mul (monomial s a') a).symm ▸ C_mul_monomial
 
+-- Have submitted to Mathlib/Mathlib4
 theorem support_eq_empty': p.support = ∅ ↔ p = 0 := by  
   constructor  
   ·    
@@ -22,10 +25,10 @@ theorem support_eq_empty': p.support = ∅ ↔ p = 0 := by
     intro hp    
     rw [hp]    
     exact support_zero    
--- #align mv_polynomial.support_zero_iff MvPolynomial.support_zero_iff
 
 variable [NoZeroDivisors R] {a: R} (s: σ→₀ℕ) (ha: a ≠ 0) (p: MvPolynomial σ R)
 
+-- Has been submitted to Mathlib/Mathlib4
 @[simp]
 theorem support_smul_eq': (a • p).support = p.support :=
   Finsupp.support_smul_eq ha
