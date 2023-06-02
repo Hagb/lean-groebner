@@ -68,13 +68,13 @@ def step_apply := by
 
 @[simp]
 lemma step_multideg_le:
-  (p.step G).2.multideg ≤ p.multideg := by  
+  (p.step G).2.multideg ≤ p.multideg := by
   unfold step
   by_cases hp : p = 0
   · -- simp? [hp]
     simp only [hp, zero_sub, ite_true, multideg_zero, le_refl]
   ·
-    by_cases hgs: ∃ g ∈ G, leading_term g∣ leading_term p    
+    by_cases hgs: ∃ g ∈ G, leading_term g∣ leading_term p
     ·-- simp? [hp, hgs]
       simp only [hp, ne_eq, hgs, dite_true, ite_false]
       rw [sub_eq_add_neg, neg_eq_neg_one_mul]
@@ -85,7 +85,7 @@ lemma step_multideg_le:
       -- simp?
       simp only [leading_term_neg, leading_term_1, leading_term_leading_term,
                 neg_mul, one_mul, multideg_neg, multideg_leading_term, le_refl]
-      -- simp only [lt_neg, leading_term_1, leading_term_leading_term, one_mul, multideg_leading_term, ne_eq, le_refl]    
+      -- simp only [lt_neg, leading_term_1, leading_term_leading_term, one_mul, multideg_leading_term, ne_eq, le_refl]
     ·-- simp? [hgs, hp]
       simp only [hp, ne_eq, hgs, dite_false, ite_false, le_refl]
 
@@ -171,7 +171,7 @@ decreasing_by
 lemma rem_empty (p: MvPolynomial σ k): rem p [] = p := by
   -- simp? [rem_apply]
   simp only [rem_apply, mv_div_empty]
-  
+
 @[simp]
 lemma quo_empty (p: MvPolynomial σ k): quo p [] = 0 := by
   simp only [quo_apply, mv_div_empty]
@@ -190,20 +190,20 @@ lemma quo_zero: quo (0: MvPolynomial σ k) G = 0 := by
 lemma rem_zero: rem (0: MvPolynomial σ k) G = 0 := by
   simp only [rem_apply, mv_div_zero]
 
-lemma step_quo_sum_add_rem: (p.step G).1.sum (·*·) + (p.step G).2 = p := by  
+lemma step_quo_sum_add_rem: (p.step G).1.sum (·*·) + (p.step G).2 = p := by
   unfold step
   by_cases hp: p = 0
   · --simp? [hp]
     simp only [hp, zero_sub, ite_true, add_zero]
     rw [Finsupp.sum_zero_index]
     -- simp only [hp, zero_sub, ite_true, Finsupp.sum_zero_index, add_zero]
-  ·    
+  ·
     by_cases hg: ∃ g, g ∈ G ∧ leading_term g ∣ leading_term p
     ·
       -- simp? [hp, hg]
       simp only [hp, ne_eq, hg, dite_true, ite_false, mul_zero,
                 Finsupp.sum_single_index, add_sub_cancel'_right]
-    ·    
+    ·
       --simp? [hp, hg]
       simp only [hp, ne_eq, hg, dite_false, ite_false, zero_add]
       rw [Finsupp.sum_zero_index, zero_add]
@@ -215,13 +215,13 @@ lemma step_quo_sum_eq_sub_rem: (p.step G).1.sum (·*·) = p - (p.step G).2 := by
 
 @[simp]
 lemma quo_sum_eq_sub_rem (p: MvPolynomial σ k) (G: List (MvPolynomial σ k)):
-  (p.quo G).sum (·*·) = p - p.rem G := by  
+  (p.quo G).sum (·*·) = p - p.rem G := by
   rw [quo_apply, rem_apply, mv_div_apply]
   by_cases hp: p = 0
   ·-- simp? [hp]
     simp only [hp, multideg_zero, dite_eq_ite, ite_true,
                 Finsupp.sum_zero_index, sub_self]
-  ·-- simp? [hp]    
+  ·-- simp? [hp]
     simp only [hp, ne_eq, dite_eq_ite, ite_false]
     rw [Finsupp.sum_add_index]
     ·
@@ -238,7 +238,7 @@ lemma quo_sum_eq_sub_rem (p: MvPolynomial σ k) (G: List (MvPolynomial σ k)):
       exact mul_add (↑a: MvPolynomial σ k) b₁ b₂
 termination_by _ => multideg'' p
 decreasing_by exact step_sub_multideg''_lt G hp
-  
+
 theorem quo_quo_sum_add_rem: (p.quo G).sum (·*·) + p.rem G = p := by
   -- simp?
   simp only [quo_sum_eq_sub_rem, sub_add_cancel]
@@ -246,13 +246,13 @@ theorem quo_quo_sum_add_rem: (p.quo G).sum (·*·) + p.rem G = p := by
 @[simp]
 lemma step_multideg_quo_mul_le (hq: q ∈ G) :
    (q * ((p.step G).1 ⟨q, List.mem_toFinset.mpr hq⟩)).multideg ≤ p.multideg :=
-by  
+by
   rw [step_apply]
   by_cases hp: p = 0
   ·-- simp? [hp]
     simp only [hp, zero_sub, ite_true, Finsupp.coe_zero, Pi.zero_apply,
                 mul_zero, multideg_zero, le_refl]
-  ·    
+  ·
     -- simp? [hp]
     simp only [hp, ne_eq, ite_false, mul_eq_zero]
     by_cases hg: ∃ g, g ∈ G ∧ leading_term g ∣ leading_term p
@@ -261,16 +261,16 @@ by
                 mul_ite, mul_zero, ite_eq_right_iff, mul_eq_zero]
 
       let g := List.head!
-                (G.filter (fun x => decide (leading_term x ∣ leading_term p)))      
+                (G.filter (fun x => decide (leading_term x ∣ leading_term p)))
       by_cases hg : g = q
       ·
         -- simp? [hg]
         simp only [hg, ite_true, mul_eq_zero, ne_eq, ge_iff_le]
         generalize_proofs _ h
         rw [←multideg_leading_term, leading_term_mul'_right,
-            multideg_leading_term, ←h.choose_spec, multideg_leading_term]      
+            multideg_leading_term, ←h.choose_spec, multideg_leading_term]
       ·--simp? [hg]
-        simp only [hg, ite_false, multideg_zero, zero_le''']    
+        simp only [hg, ite_false, multideg_zero, zero_le''']
     ·
       -- simp? [hg]
       simp only [hg, dite_false, Finsupp.coe_zero, Pi.zero_apply, mul_zero,
@@ -279,25 +279,25 @@ by
 theorem multideg_quo_mul_le (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
   (q: MvPolynomial σ k) (hq: q ∈ G):
   (q * (p.quo G ⟨q, List.mem_toFinset.mpr hq⟩)).multideg ≤ p.multideg :=
-by  
+by
   rw [quo_apply]
   unfold mv_div
   by_cases hp: p = 0
   ·
     -- simp? [hp]
     simp only [hp, multideg_zero, dite_eq_ite, ite_true,
-              Finsupp.coe_zero, Pi.zero_apply, mul_zero, le_refl]  
+              Finsupp.coe_zero, Pi.zero_apply, mul_zero, le_refl]
   ·
     -- simp? [hp]
     simp only [hp, ne_eq, dite_eq_ite, ite_false, Finsupp.coe_add,
               Pi.add_apply, mul_eq_zero]
-    rw [mul_add]    
+    rw [mul_add]
     apply le_trans multideg_add_le
     -- simp? [step_multideg_quo_mul_le p G hq]
     simp only [mul_eq_zero, ne_eq, ge_iff_le, max_le_iff,
               step_multideg_quo_mul_le p G hq, true_and]
       -- Why step_multideg_quo_mul_le not work?
-    rw [←quo_apply]    
+    rw [←quo_apply]
     apply le_trans (multideg_quo_mul_le
                     ((p.step G).2 - (p.step G).2.coeff (multideg p) • lm p)
                     G q hq)
@@ -307,25 +307,25 @@ decreasing_by exact step_sub_multideg''_lt G hp
 
 lemma step_eq_iff (hp : p ≠ 0):
   (p.step G).2 = p ↔
-  ∀ g ∈ G, g ≠ 0 → ¬ LE.le (α:=σ→₀ℕ) g.multideg p.multideg := by  
+  ∀ g ∈ G, g ≠ 0 → ¬ LE.le (α:=σ→₀ℕ) g.multideg p.multideg := by
   constructor
-  ·    
+  ·
     intros h g hg hg'
     -- simp? [step_apply, hp] at h
     simp only [step_apply, ne_eq, multideg_eq_zero_iff,
               not_exists, hp, ite_false] at h
     by_cases hg's : ∃ g, g ∈ G ∧ leading_term g ∣ leading_term p
-    ·      
+    ·
       simp [hg's] at h
       -- simp [step_quo_ne_zero'' p G hp hg's] at h
       -- simp [step_quo_dvd_choose p G hp hg's] at h
       -- simp only [hg's, dite_true, sub_eq_self, mul_eq_zero,
       --           ne_eq, multideg_eq_zero_iff, not_exists] at h
-      
+
       let g's := G.filter (leading_term ·∣ leading_term p)
       have gnonempty: g's ≠ [] :=  List.filter_ne_nil'.mpr (hg's)
       have := List.of_mem_filter (List.head!_mem_self gnonempty)
-      have key := of_decide_eq_true this      
+      have key := of_decide_eq_true this
       cases' h with h h
       · exfalso
         rw [h] at key
@@ -333,7 +333,7 @@ lemma step_eq_iff (hp : p ≠ 0):
       · exfalso
         have key := h ▸ key.choose_spec
         simp [hp] at key
-    ·      
+    ·
       push_neg at hg's
       specialize hg's g hg
       simp [leading_term_def, hg', hp, monomial_dvd_monomial] at hg's
@@ -344,7 +344,7 @@ lemma step_eq_iff (hp : p ≠ 0):
         rw [dvd_iff_exists_eq_mul_left, not_exists] at hg's
         apply hg's (p.leading_coeff / g.leading_coeff)
         rw [div_mul_cancel _ (g.leading_coeff_eq_zero_iff.not.mpr hg')]
-  ·    
+  ·
     intros hg
     simp [step_apply, hp]
     by_cases hg's : ∃ g, g ∈ G ∧ leading_term g ∣ leading_term p
@@ -356,23 +356,23 @@ lemma step_eq_iff (hp : p ≠ 0):
       simp [hg's, hg]
 
 lemma step_multideg_eq_iff_eq (h : (p.step G).2 ≠ 0):
-  (p.step G).2.multideg = p.multideg ↔ (p.step G).2 = p := by  
+  (p.step G).2.multideg = p.multideg ↔ (p.step G).2 = p := by
   have hp := ne_zero_of_step_quo_ne_zero p G h
   simp [step, hp, h]
   by_cases hg : ∃ g, g ∈ G ∧ leading_term g ∣ leading_term p
-  ·    
+  ·
     simp [hg, hp, step_apply] at h
     simp [hg]
     generalize_proofs _ hdvd
     have hp' : p.leading_term ≠ 0 := p.leading_term_eq_zero_iff.not.mpr hp
     rw [hdvd.choose_spec] at hp'
     simp at hp'
-    simp [hp']    
+    simp [hp']
     let g := List.head! (G.filter (leading_term · ∣ leading_term p))
     have : p.leading_term = leading_term (g * hdvd.choose) := by
       rw [leading_term_mul'_right, ←hdvd.choose_spec]
       rw [leading_term_leading_term]
-    refine ne_of_lt ((multideg_sub_lt_left_iff ?_ h).mpr this)    
+    refine ne_of_lt ((multideg_sub_lt_left_iff ?_ h).mpr this)
     apply le_of_eq
     nth_rewrite 1 [leading_term_def] at this -- Why rw not work?
     nth_rewrite 1 [leading_term_def] at this
@@ -404,7 +404,7 @@ Trans.trans
 
 theorem rem_support (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
   {g : MvPolynomial σ k} (h : g ∈ G) (h' : g ≠ 0):
-  ∀ s ∈ (p.rem G).support, ¬ LE.le (α:=σ→₀ℕ) g.multideg s := by  
+  ∀ s ∈ (p.rem G).support, ¬ LE.le (α:=σ→₀ℕ) g.multideg s := by
   intros s hs
   -- rw [rem_apply, mv_div_apply] at hs'
   by_cases hp : p = 0
@@ -412,10 +412,10 @@ theorem rem_support (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
     -- why simp [hp] at hs not work??
     rw [hp, rem_zero, support_zero] at hs
     exfalso
-    exact Finset.not_mem_empty s hs  
+    exact Finset.not_mem_empty s hs
   ·
     -- workaround
-    rw [rem_apply, mv_div_apply] at hs    
+    rw [rem_apply, mv_div_apply] at hs
     -- simp? only [hp] at hs
     -- simp? only [←rem_apply] at hs
     -- simp? at hs
@@ -423,19 +423,19 @@ theorem rem_support (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
     simp only [ne_eq, multideg_eq_zero_iff, not_exists, hp, rem_apply,
               dite_eq_ite, ite_false, mem_support_iff, coeff_add] at hs
     -- simp? only [coeff_smul] at hs
-    -- set_option synthInstance.etaExperiment true in 
+    -- set_option synthInstance.etaExperiment true in
     rw [coeff_smul] at hs
     -- simp? at hs
-    rw [smul_eq_mul] at hs    
+    rw [smul_eq_mul] at hs
     have hnext := rem_support
       ((step p G).snd - (p.step G).2.coeff p.multideg • p.lm)
       G h h' s
     -- simp? at hnext
-    simp only [ne_eq, mem_support_iff, not_imp_not] at hnext    
+    simp only [ne_eq, mem_support_iff, not_imp_not] at hnext
     by_contra tmp
     simp only [ne_eq, hp, hnext tmp , zero_add, mul_eq_zero] at hs
     push_neg at hs
-    cases' hs with hs₁ hs₂    
+    cases' hs with hs₁ hs₂
     -- simp? [hp, lm, multideg'_eq_multideg hp] at hs₂
     simp only [lm, ne_eq, hp, not_false_eq_true, multideg'_eq_multideg hp,
                 dite_eq_ite, ite_true, coeff_monomial, ite_eq_right_iff,
@@ -457,12 +457,12 @@ variable (G': Finset (MvPolynomial σ k))
 def is_rem
   (r: MvPolynomial σ k)
 := (∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s) ∧
-    ∃(q : G' →₀ MvPolynomial σ k), 
+    ∃(q : G' →₀ MvPolynomial σ k),
       (∀(g: MvPolynomial σ k) (hg : g ∈ G'),
         (g * q ⟨g, hg⟩).multideg ≤ p.multideg )∧
       p = q.sum (·*·) + r
 
-theorem rem_is_rem : is_rem p G.toFinset (p.rem G) := by  
+theorem rem_is_rem : is_rem p G.toFinset (p.rem G) := by
   constructor
   ·
     intro g hg
@@ -481,7 +481,7 @@ lemma rem_is_rem' : is_rem p G' (p.rem G'.toList) := by
   simp at this
   exact this
 
-theorem exists_rem : ∃ r : MvPolynomial σ k, is_rem p G' r := by  
+theorem exists_rem : ∃ r : MvPolynomial σ k, is_rem p G' r := by
   use p.rem G'.toList
   simp only [rem_is_rem']
 

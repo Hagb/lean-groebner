@@ -430,18 +430,18 @@ variable {R : Type _} [CommSemiring R]
 def leading_term_ideal : Ideal (MvPolynomial σ k) := span (leading_term '' G'')
 
 
-lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by  
+lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by
   ext q
   rw [leading_term_ideal]
-  constructor  
-  ·    
+  constructor
+  ·
     intro hq
     rw [mem_span_iff''] at hq
     rcases hq with ⟨s, f, hs, hq⟩
-    rw [hq]    
+    rw [hq]
     apply Ideal.sum_mem
     intro m hm
-    apply Ideal.mul_mem_left    
+    apply Ideal.mul_mem_left
     have hm := Set.mem_of_subset_of_mem hs hm
     rw [Set.mem_image] at hm
     rcases hm with ⟨p, hp, hm⟩
@@ -449,8 +449,8 @@ lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by
     apply Ideal.mul_mem_left --(span (lm '' G'')) _ (b:=lm p)
     apply Set.mem_of_subset_of_mem subset_span
     rw [Set.mem_image]
-    exact ⟨p, hp , rfl⟩  
-  ·    
+    exact ⟨p, hp , rfl⟩
+  ·
     intro hq
     rw [mem_span_iff''] at hq
     rcases hq with ⟨s, f, hs, hq⟩
@@ -459,7 +459,7 @@ lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by
     intro m hm
     apply Ideal.mul_mem_left
     by_cases h : m = 0
-    ·simp [h]    
+    ·simp [h]
     have hm := Set.mem_of_subset_of_mem hs hm
     rw [Set.mem_image] at hm
     rcases hm with ⟨p, hp, hm⟩
@@ -476,7 +476,7 @@ lemma leading_term_ideal_def : leading_term_ideal G'' = span (lm '' G''):= by
 
 lemma leading_term_ideal_span_monomial :
   leading_term_ideal G'' =
-  span ((monomial · (1 : k)) '' ((G'' \ {0}).image (β:=σ→₀ℕ) multideg)) := by  
+  span ((monomial · (1 : k)) '' ((G'' \ {0}).image (β:=σ→₀ℕ) multideg)) := by
   rw [leading_term_ideal_def, ←span_sdiff_singleton_zero_eq (lm '' G'')]
   congr
   have : lm '' G'' \ {0} = lm '' (G'' \ {0}) := by
@@ -484,7 +484,7 @@ lemma leading_term_ideal_span_monomial :
       ext x
       simp [lm_eq_zero_iff]
     nth_rewrite 2 [this]
-    exact Set.image_diff_preimage.symm  
+    exact Set.image_diff_preimage.symm
   rw [this, Set.image_image]
   apply Set.image_congr
   simp
@@ -495,7 +495,7 @@ lemma rem_mem_ideal_iff {p : MvPolynomial σ k}
   {G' : Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
   {r : MvPolynomial σ k}
   (h : G'.toSet ⊆ I) (hG' : is_rem p G' r):
-  r ∈ I ↔ p ∈ I := by  
+  r ∈ I ↔ p ∈ I := by
   constructor
   · intro hr
     rw [hG'.2.choose_spec.2]
@@ -509,9 +509,9 @@ lemma rem_mem_ideal_iff {p : MvPolynomial σ k}
 lemma rem_sub_rem_mem_ideal {G' : Finset (MvPolynomial σ k)}
   {I : Ideal (MvPolynomial σ k)} (hG' : G'.toSet ⊆ I)
   {p r₁ r₂ : MvPolynomial σ k}
-  (hr₁ : is_rem p G' r₁) (hr₂ : is_rem p G' r₂) : r₁-r₂ ∈ I := by  
+  (hr₁ : is_rem p G' r₁) (hr₂ : is_rem p G' r₂) : r₁-r₂ ∈ I := by
   have h₁ := eq_sub_of_add_eq' hr₁.2.choose_spec.2.symm
-  have h₂ := eq_sub_of_add_eq' hr₂.2.choose_spec.2.symm  
+  have h₂ := eq_sub_of_add_eq' hr₂.2.choose_spec.2.symm
   rw [h₁, h₂]
   simp
   rw [←Finsupp.sum_sub_index _]
@@ -523,7 +523,7 @@ lemma rem_sub_rem_mem_ideal {G' : Finset (MvPolynomial σ k)}
 lemma monomial_not_mem_leading_term_ideal {r : MvPolynomial σ k}
   {G' : Set (MvPolynomial σ k)}
   (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
-: ∀ s ∈ r.support, monomial s 1 ∉ leading_term_ideal G' := by  
+: ∀ s ∈ r.support, monomial s 1 ∉ leading_term_ideal G' := by
   intro s hs
   rw [leading_term_ideal_span_monomial, mem_ideal_span_monomial_image]
   simp
@@ -533,7 +533,7 @@ lemma monomial_not_mem_leading_term_ideal {r : MvPolynomial σ k}
 lemma term_not_mem_leading_term_ideal {r : MvPolynomial σ k}
   {G' : Set (MvPolynomial σ k)}
   (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
-: ∀ s ∈ r.support, monomial s (r.coeff s) ∉ leading_term_ideal G' := by  
+: ∀ s ∈ r.support, monomial s (r.coeff s) ∉ leading_term_ideal G' := by
   intro s hs
   have := monomial_not_mem_leading_term_ideal h s hs
   by_contra h'
@@ -546,7 +546,7 @@ lemma not_mem_leading_term_ideal {r : MvPolynomial σ k}
   {G' : Set (MvPolynomial σ k)}
   (h : ∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s)
   (hr : r ≠ 0) :
-r ∉ leading_term_ideal G' := by  
+r ∉ leading_term_ideal G' := by
   rw [leading_term_ideal_span_monomial, mem_ideal_span_monomial_image]
   simp
   use multideg r
@@ -576,11 +576,11 @@ lemma rem_sub_rem_term_not_mem_leading_term_ideal
   {G' : Finset (MvPolynomial σ k)} {p r₁ r₂ : MvPolynomial σ k}
   (hr₁ : is_rem p G' r₁) (hr₂ : is_rem p G' r₂) :
   ∀ s ∈ (r₁-r₂).support, monomial s ((r₁-r₂).coeff s) ∉ leading_term_ideal G'
-:= by  
+:= by
   apply term_not_mem_leading_term_ideal
-  intro g hg hg' s hs  
+  intro g hg hg' s hs
   have := Set.mem_of_subset_of_mem (support_sub σ r₁ r₂) hs
-  simp [-mem_support_iff] at this  
+  simp [-mem_support_iff] at this
   cases' this with hs hs
   ·exact hr₁.1 g hg hg' s hs
   ·exact hr₂.1 g hg hg' s hs

@@ -88,7 +88,7 @@ end TermOrder
 
 
 -- @[simp]
--- lemma zero_le''' (a : α): 0 ≤ a := 
+-- lemma zero_le''' (a : α): 0 ≤ a :=
 -- example [Zero α] [LE α] [ZeroLEClass α] : Bot α := inferInstance
 -- from https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/.E2.9C.94.20Override.20default.20ordering.20instance/near/339882298
 
@@ -123,13 +123,13 @@ variable {σ: Type _} [TermOrderClass (TermOrder (σ→₀ℕ))] {k₁ k₂: σ�
 
 
 lemma TermOrder.le_of_finsupp_le (h: k₁≤k₂): LE.le (α:=TermOrder (σ→₀ℕ)) k₁ k₂
-  := by  
-  rw [←add_tsub_cancel_iff_le.mpr h]  
+  := by
+  rw [←add_tsub_cancel_iff_le.mpr h]
   -- simp?
   simp only [ge_iff_le, le_add_iff_nonneg_right]
   exact ZeroLEClass.zero_le _
 
-lemma TermOrder.lt_of_finsupp_lt (h: k₁<k₂): LT.lt (α:=TermOrder (σ→₀ℕ)) k₁ k₂  
+lemma TermOrder.lt_of_finsupp_lt (h: k₁<k₂): LT.lt (α:=TermOrder (σ→₀ℕ)) k₁ k₂
   := lt_of_le_of_ne (le_of_finsupp_le (le_of_lt h)) (ne_of_lt (α:=σ→₀ℕ) h)
 
 

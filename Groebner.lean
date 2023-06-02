@@ -26,15 +26,15 @@ def is_groebner_basis :=
   G'.toSet ⊆ I ∧ leading_term_ideal I = leading_term_ideal G'.toSet
 
 theorem exists_groebner_basis [Finite σ] :
-  ∃ G' : Finset (MvPolynomial σ k), is_groebner_basis G' I := by  
+  ∃ G' : Finset (MvPolynomial σ k), is_groebner_basis G' I := by
   let ltideal : Ideal (MvPolynomial σ k) := leading_term_ideal I
   have key : Ideal.FG ltideal := (inferInstance : IsNoetherian _ _).noetherian _
-  simp only [leading_term_ideal] at key  
+  simp only [leading_term_ideal] at key
   rw [Ideal.fg_span_iff_fg_span_finset_subset] at key
   rcases key with ⟨s, hs, h⟩
-  have := Set.subset_image hs  
+  have := Set.subset_image hs
   have ⟨G', hG', h'⟩ := Set.finset_subset_preimage_of_finite_image
-                                        (this.symm ▸ Finset.finite_toSet s)  
+                                        (this.symm ▸ Finset.finite_toSet s)
   use G'
   constructor
   ·exact (Set.subset_inter_iff.mp hG').1
@@ -44,19 +44,19 @@ theorem exists_groebner_basis [Finite σ] :
 
 lemma groebner_basis_self {G' : Finset (MvPolynomial σ k)}
   {I : Ideal (MvPolynomial σ k)} (h : is_groebner_basis G' I) :
-  is_groebner_basis G' (span G') := by  
+  is_groebner_basis G' (span G') := by
   constructor
   ·
-    exact subset_span  
+    exact subset_span
   ·
     rw [←SetLike.coe_set_eq]
-    apply Set.eq_of_subset_of_subset    
+    apply Set.eq_of_subset_of_subset
     ·
       rw [←h.2, leading_term_ideal, leading_term_ideal]
       apply Ideal.span_mono
       apply Set.image_subset
       rw [SetLike.coe_subset_coe, span_le]
-      exact h.1    
+      exact h.1
     ·
       rw [leading_term_ideal, leading_term_ideal]
       apply Ideal.span_mono
@@ -67,11 +67,11 @@ theorem groebner_basis_rem_eq_zero_iff {p : MvPolynomial σ k}
   {G' : Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
   {r : MvPolynomial σ k}
   (h : is_groebner_basis G' I) (hG' : is_rem p G' r):
-  r = 0 ↔ p ∈ I := by  
+  r = 0 ↔ p ∈ I := by
   constructor
   · intro hr
     rw [hr] at hG'
-    exact (rem_mem_ideal_iff h.1 hG').mp I.zero_mem  
+    exact (rem_mem_ideal_iff h.1 hG').mp I.zero_mem
   · intro hp
     by_contra hr
     apply rem_term_not_mem_leading_term_ideal hG' r.multideg
@@ -84,7 +84,7 @@ theorem groebner_basis_rem_eq_zero_iff {p : MvPolynomial σ k}
 
 theorem groebner_basis_is_basis
   {G': Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
-  (h : is_groebner_basis G' I) : I = span G' := by  
+  (h : is_groebner_basis G' I) : I = span G' := by
   rw [←SetLike.coe_set_eq]
   apply Set.eq_of_subset_of_subset
   · intro p hp
@@ -99,24 +99,24 @@ theorem groebner_basis_is_basis
     rw [hrem] at this
     have := eq_of_sub_eq_zero this
     rw [this]
-    exact sum_mul_mem_of_subset' subset_span q  
+    exact sum_mul_mem_of_subset' subset_span q
   ·simp [span_le, h.1]
 
 theorem groebner_basis_unique_rem
   {G': Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
   (h : is_groebner_basis G' I) :
-  ∃! (r : MvPolynomial σ k), is_rem p G' r := by  
-  apply exists_unique_of_exists_of_unique (exists_rem p G')  
+  ∃! (r : MvPolynomial σ k), is_rem p G' r := by
+  apply exists_unique_of_exists_of_unique (exists_rem p G')
   intros r₁ r₂ hr₁ hr₂
   by_contra' hr
-  have hr := sub_ne_zero_of_ne hr  
+  have hr := sub_ne_zero_of_ne hr
   have : (r₁-r₂).multideg ∈ (r₁-r₂).support := by
     simp [hr, ←(multideg'_eq_multideg hr), multideg']
     exact Finset.max'_mem _ _
   apply rem_sub_rem_term_not_mem_leading_term_ideal hr₁ hr₂ (r₁-r₂).multideg this
-  rw [←h.2, leading_term_ideal, ←leading_coeff_def, ←leading_term_def]  
+  rw [←h.2, leading_term_ideal, ←leading_coeff_def, ←leading_term_def]
   have := Set.mem_image_of_mem leading_term (rem_sub_rem_mem_ideal h.1 hr₁ hr₂)
-  exact Set.mem_of_subset_of_mem subset_span this  
+  exact Set.mem_of_subset_of_mem subset_span this
 
 -- noncomputable def groebner_rem
 --   {G': Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}

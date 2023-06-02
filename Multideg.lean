@@ -153,11 +153,10 @@ lemma ne_zero_of_multideg_ne_zero
   by_contra hp
   simp only [hp, multideg_zero, ne_eq, not_true] at h
 
-
-lemma coeff_eq_zero_of_multideg_lt {p: MvPolynomial σ R} (h: multideg p < s):
-  coeff s p = 0 := by  
-  rw [←not_mem_support_iff]  
-  by_contra hs  
+lemma   coeff_eq_zero_of_multideg_lt {p: MvPolynomial σ R} (h: multideg p < s):
+  coeff s p = 0 := by
+  rw [←not_mem_support_iff]
+  by_contra hs
   unfold multideg at h
   exact not_le_of_lt h (Finset.le_sup (f:=@id (TermOrder (σ→₀ℕ))) hs)
 
@@ -275,7 +274,7 @@ lemma leading_term_eq_zero_iff: leading_term p = 0 ↔ p = 0 := by
 @[simp]
 lemma leading_term_0 : leading_term (0 : MvPolynomial σ R) = 0 := by
   -- simp?
-  simp only [ne_eq, leading_term_eq_zero_iff]  
+  simp only [ne_eq, leading_term_eq_zero_iff]
 
 
 lemma leading_term_def:
@@ -353,19 +352,19 @@ lemma le_multideg {i: TermOrder (σ→₀ℕ)} (h: i ∈ p.support): i ≤ p.mul
 theorem multideg'_mul_le (pq_ne_zero: p * q ≠ 0):
   multideg' (p * q) pq_ne_zero ≤
       (multideg' p (ne_zero_and_ne_zero_of_mul pq_ne_zero).1) +
-      (multideg' q (ne_zero_and_ne_zero_of_mul pq_ne_zero).2) := by  
+      (multideg' q (ne_zero_and_ne_zero_of_mul pq_ne_zero).2) := by
   have pqsup_nonempty :=
     Finset.nonempty_of_ne_empty (support_eq_empty.not.mpr pq_ne_zero)
   unfold multideg'
   have mul_sup := support_mul p q
   have h :=
-    mem_of_subset mul_sup (max'_mem (α:=TermOrder (σ→₀ℕ)) _ pqsup_nonempty)  
+    mem_of_subset mul_sup (max'_mem (α:=TermOrder (σ→₀ℕ)) _ pqsup_nonempty)
   rw [Finset.mem_biUnion] at h
   rcases h with ⟨a, ha, h⟩
   rw [Finset.mem_biUnion] at h
   rcases h with ⟨b, hb, h⟩
   rw [Finset.mem_singleton] at h
-  rw [h]  
+  rw [h]
   apply add_le_add
   ·exact Finset.le_max' (α:=TermOrder (σ→₀ℕ)) _ _ ha
   ·exact Finset.le_max' (α:=TermOrder (σ→₀ℕ)) _ _ hb
@@ -383,7 +382,7 @@ lemma multideg_mul_le: multideg (p * q) ≤ multideg p + multideg q := by
 lemma coeff_multideg'_add_mul:
   (p * q).coeff (multideg' p p_ne_zero + multideg' q q_ne_zero) =
   leading_coeff p * leading_coeff q :=
-by  
+by
   rw [coeff_mul]
   unfold leading_coeff
   -- simp? [p_ne_zero, q_ne_zero]
@@ -392,12 +391,12 @@ by
   let deg'q: σ→₀ℕ := multideg' q q_ne_zero
   rw [Finset.sum_eq_add_sum_diff_singleton
         (i:=(deg'p, deg'q))
-        (by rw [Finsupp.mem_antidiagonal])]  
-  rw [(_: 
+        (by rw [Finsupp.mem_antidiagonal])]
+  rw [(_:
       ((deg'p + deg'q).antidiagonal \ {(deg'p, deg'q)}).sum
         (fun x => p.coeff x.1 * q.coeff x.2) = 0
       )]
-  exact add_zero _  
+  exact add_zero _
   rw [←Finset.sum_coe_sort]
   let s := (deg'p + deg'q).antidiagonal \ {(deg'p, deg'q)}
   have: ∀(i: s),
@@ -407,37 +406,37 @@ by
     simp only [Subtype.forall, Finsupp.mem_antidiagonal, not_true,
                 Finset.mem_sdiff, Finset.mem_singleton, and_imp, Prod.forall,
                 Prod.mk.injEq]
-    rintro (a: TermOrder (σ→₀ℕ)) (b: TermOrder (σ→₀ℕ)) hab hab'    
+    rintro (a: TermOrder (σ→₀ℕ)) (b: TermOrder (σ→₀ℕ)) hab hab'
     by_contra'
-    let ⟨ha, hb⟩ := ne_zero_and_ne_zero_of_mul this    
+    let ⟨ha, hb⟩ := ne_zero_and_ne_zero_of_mul this
     rw [←mem_support_iff] at ha
-    rw [←mem_support_iff] at hb    
+    rw [←mem_support_iff] at hb
     have ha' := le_multideg' p_ne_zero ha
-    have hb' := le_multideg' q_ne_zero hb    
-    by_cases ha: a = deg'p    
+    have hb' := le_multideg' q_ne_zero hb
+    by_cases ha: a = deg'p
     ·
       rw [ha] at hab
       have hb:= add_left_cancel hab
-      exact hab' ⟨ha, hb⟩    
+      exact hab' ⟨ha, hb⟩
     ·
       have key :=
         calc
           deg'p + deg'q
           _ = a + b := hab.symm
           _ < multideg' p _ + b := add_lt_add_right (lt_of_le_of_ne ha' ha) b
-      exact ((lt_iff_not_ge _ _).mp (lt_of_add_lt_add_left key)) hb'  
+      exact ((lt_iff_not_ge _ _).mp (lt_of_add_lt_add_left key)) hb'
   -- simp? [this]
   simp only [Finset.sum_const_zero, this]
 
 
 lemma multideg'_mul [NoZeroDivisors R]:
   multideg' (p*q) (mul_ne_zero_iff.mpr ⟨p_ne_zero, q_ne_zero⟩) =
-    p.multideg' p_ne_zero + q.multideg' q_ne_zero  
+    p.multideg' p_ne_zero + q.multideg' q_ne_zero
   := by
   have pq_ne_zero := mul_ne_zero_iff.mpr ⟨p_ne_zero, q_ne_zero⟩
   rw [le_antisymm_iff]
-  constructor  
-  ·exact multideg'_mul_le pq_ne_zero  
+  constructor
+  ·exact multideg'_mul_le pq_ne_zero
   ·
     -- conv_rhs => rw [multideg']
     apply Finset.le_max'
@@ -486,14 +485,14 @@ lemma multideg_eq_zero_iff: multideg q = 0 ↔ ∃ c : R, q = C c := by
 
 @[simp]
 lemma leading_coeff_mul [NoZeroDivisors R]:
-  leading_coeff (p * q) = leading_coeff p * leading_coeff q := by  
-  by_cases hpq: p * q = 0  
+  leading_coeff (p * q) = leading_coeff p * leading_coeff q := by
+  by_cases hpq: p * q = 0
   ·
     cases' (mul_eq_zero.mp hpq) with h h
-    <;> simp [h, (leading_coeff_eq_zero_iff _).mpr]  
-  ·    
-    let ⟨p_ne_zero, q_ne_zero⟩ := mul_ne_zero_iff.mp hpq    
-    rw [←coeff_multideg'_add_mul]    
+    <;> simp [h, (leading_coeff_eq_zero_iff _).mpr]
+  ·
+    let ⟨p_ne_zero, q_ne_zero⟩ := mul_ne_zero_iff.mp hpq
+    rw [←coeff_multideg'_add_mul]
     unfold leading_coeff
     -- simp? [p_ne_zero, q_ne_zero, multideg'_mul]
     simp only [ne_eq, mul_eq_zero, p_ne_zero, q_ne_zero, or_self,
@@ -602,16 +601,16 @@ noncomputable def leading_termMulHomo [NoZeroDivisors R] :
 
 lemma multideg_add_le_right
     {p q: MvPolynomial σ R} (h: multideg p <= multideg q):
-  multideg (p + q) ≤ multideg q := by  
+  multideg (p + q) ≤ multideg q := by
   -- conv_lhs => unfold multideg
   nth_rewrite 1 [multideg]
   -- simp?
   simp only [Finset.sup_le_iff, id_eq]
-  intros b hb  
-  rw [mem_support_iff, coeff_add] at hb  
+  intros b hb
+  rw [mem_support_iff, coeff_add] at hb
   by_contra hq
   -- simp? at hq
-  simp only [ne_eq, not_le] at hq  
+  simp only [ne_eq, not_le] at hq
   apply hb
   rw [coeff_eq_zero_of_multideg_lt hq,
       coeff_eq_zero_of_multideg_lt (lt_of_le_of_lt h hq), add_zero]
@@ -619,6 +618,7 @@ lemma multideg_add_le_right
 lemma multideg_add_le_left
     {p q: MvPolynomial σ R} (h: multideg q <= multideg p):
   multideg (p + q) ≤ multideg p := add_comm p q ▸ multideg_add_le_right h
+
 theorem multideg_add_le: multideg (p+q) ≤ max p.multideg q.multideg := by
   -- simp?
   simp only [ne_eq, ge_iff_le, le_max_iff]
@@ -634,18 +634,18 @@ theorem multideg_add_le: multideg (p+q) ≤ max p.multideg q.multideg := by
 
 lemma multideg_add_eq_right
     {p q: MvPolynomial σ R} (h: multideg p < multideg q):
-  multideg (p+q) = multideg q := by  
+  multideg (p+q) = multideg q := by
   have q_ne_zero :=
     ne_zero_of_multideg_ne_zero $ ne_bot_of_gt h
   have h₁: coeff (multideg q) (p + q) ≠ 0 := by
     rw [coeff_add, coeff_eq_zero_of_multideg_lt h,
         zero_add, ←leading_coeff_def]
     exact (leading_coeff_eq_zero_iff q).not.mpr q_ne_zero
-  have pq_ne_zero : p + q ≠ 0 := ne_zero_iff.mpr ⟨q.multideg, h₁⟩  
+  have pq_ne_zero : p + q ≠ 0 := ne_zero_iff.mpr ⟨q.multideg, h₁⟩
   apply Eq.symm
   rw [←multideg'_eq_multideg pq_ne_zero, multideg'_iff]
   constructor
-  ·exact h₁  
+  ·exact h₁
   ·
     intros s' hs'
     rw [coeff_add,
@@ -664,33 +664,33 @@ theorem monomial_add {s : σ →₀ ℕ} {a b : R} :
 AddMonoidAlgebra.single_add s a b
 lemma multideg_add_lt_left_iff (h : q.multideg ≤ p.multideg)
   (h₂: p + q ≠ 0):
-  multideg (p+q) < p.multideg ↔ leading_term p + leading_term q = 0 := by  
+  multideg (p+q) < p.multideg ↔ leading_term p + leading_term q = 0 := by
   rw [leading_term_def, leading_term_def]
-  constructor  
+  constructor
   · intro hpq
     have hcoeff : (p+q).coeff p.multideg = 0 := by
       rw [coeff_eq_zero_of_multideg_lt]
       exact hpq
     have p_ne_zero : p ≠ 0 := by
       apply ne_zero_of_multideg_ne_zero
-      exact (ne_of_lt (lt_of_le_of_lt (zero_le''' (p+q).multideg) hpq)).symm    
+      exact (ne_of_lt (lt_of_le_of_lt (zero_le''' (p+q).multideg) hpq)).symm
     have hdeg : p.multideg = q.multideg := by
       by_contra hdeg
       rw [coeff_add] at hcoeff
       rw [coeff_eq_zero_of_multideg_lt (lt_of_le_of_ne' h hdeg)] at hcoeff
-      simp [←leading_coeff_def, p_ne_zero] at hcoeff    
+      simp [←leading_coeff_def, p_ne_zero] at hcoeff
     rw [hdeg, ←monomial_add]
     rw [monomial_eq_zero, leading_coeff_def, leading_coeff_def,
         ←hdeg, ←coeff_add]
-    exact hcoeff  
+    exact hcoeff
   · intro hpq
     apply lt_of_le_of_ne (multideg_add_le_left h)
-    by_contra hpq'    
+    by_contra hpq'
     by_cases hpq'' : p.multideg = q.multideg
     · rw [←hpq'', ←hpq', ←monomial_add, monomial_eq_zero] at hpq
       rw [leading_coeff_def, leading_coeff_def, ←hpq'', ←hpq'] at hpq
       rw [←coeff_add, ←leading_coeff_def, leading_coeff_eq_zero_iff] at hpq
-      exact h₂ hpq    
+      exact h₂ hpq
     · change @Ne (σ →₀ ℕ) p.multideg q.multideg at hpq''
       have hp := hpq.symm ▸ coeff_zero p.multideg
       simp [hpq''.symm] at hp
@@ -783,7 +783,7 @@ variable {R : Type _} [CommRing R] (p q : MvPolynomial σ R)
 lemma multideg_sub_lt_left_iff
   {p q : MvPolynomial σ R} (h : q.multideg ≤ p.multideg) (h₂ : p - q≠0) :
   multideg (p - q) < p.multideg ↔ p.leading_term = q.leading_term := by
-  
+
   rw [sub_eq_add_neg] at h₂
   rw [←multideg_neg (p:=q)] at h
   rw [sub_eq_add_neg, multideg_add_lt_left_iff h h₂, leading_term_neg]
@@ -799,9 +799,9 @@ lemma multideg_sub_lt_left_iff
 @[simp]
 lemma sub_multideg_le [CommRing R₁] {p q: MvPolynomial σ R₁}
   (h: multideg q ≤ multideg p) :
-  multideg (q - q.coeff p.multideg • p.lm) ≤ multideg p := by  
+  multideg (q - q.coeff p.multideg • p.lm) ≤ multideg p := by
   rw [smul_eq_C_mul, sub_eq_add_neg, ←neg_mul (C (coeff (multideg p) q)) p.lm]
-  refine le_trans multideg_add_le ?_  
+  refine le_trans multideg_add_le ?_
   by_cases hc : q.coeff p.multideg = 0
   ·-- simp? [h, hc]
     simp only [hc, map_zero, neg_zero, zero_mul, multideg_zero,
@@ -817,11 +817,11 @@ lemma sub_multideg_le [CommRing R₁] {p q: MvPolynomial σ R₁}
 lemma sub_multideg_lt [CommRing R₁] {p q: MvPolynomial σ R₁} (hp: p ≠ 0)
   (h: multideg q ≤ multideg p) :
   q - q.coeff p.multideg • lm p = 0 ∨
-  multideg (q - q.coeff p.multideg • lm p) < multideg p := by  
+  multideg (q - q.coeff p.multideg • lm p) < multideg p := by
   by_cases h' : q - q.coeff p.multideg • lm p = 0
   ·
     left
-    exact h'  
+    exact h'
   ·
     right
     apply lt_of_le_of_ne (sub_multideg_le h)
