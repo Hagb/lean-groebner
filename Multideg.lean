@@ -29,6 +29,7 @@ def multideg: TermOrder (σ →₀ ℕ) :=
   p.support.sup (α:=TermOrder (σ→₀ℕ)) (β:=TermOrder (σ→₀ℕ)) id
 -- #align mv_polynomial.multideg MvPolynomial.multideg
 
+-- TODO: remove multideg'
 def multideg' : TermOrder (σ →₀ ℕ) :=
 p.support.max' (α:=TermOrder (σ→₀ℕ))
 (Finset.nonempty_of_ne_empty (support_eq_empty.not.mpr p_ne_zero))

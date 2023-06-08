@@ -40,6 +40,7 @@ I prove this statement by definition the division algorithm (`mv_div`, `quo`, `r
 ## TODO
 
 - Lexicographic order is a term order
+- remove `multideg'`
 - More properties of Gröbner basis
 - Submit to Mathlib4 (maybe partically, because I think the quality of most of my code is not high enough for Mathlib4)
 - Improve the readability of the code, and write more comments and documents
