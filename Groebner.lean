@@ -82,6 +82,77 @@ theorem groebner_basis_rem_eq_zero_iff {p : MvPolynomial σ k}
     exact Set.mem_image_of_mem
             leading_term ((rem_mem_ideal_iff h.1 hG').mpr hp)
 
+theorem groebner_basis_rem_eq_zero_iff' {p : MvPolynomial σ k}
+  {G' : Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
+  (h : is_groebner_basis G' I) : is_rem p G' 0 ↔ p ∈ I := by
+  constructor
+  · intro hp
+    exact (groebner_basis_rem_eq_zero_iff h hp).mp rfl
+  · intro hp
+    have :=
+      (groebner_basis_rem_eq_zero_iff h (exists_rem p G').choose_spec).mpr hp
+    exact this ▸ (exists_rem p G').choose_spec
+
+theorem groebner_basis_def :
+  is_groebner_basis G' I ↔ G'.toSet ⊆ I ∧ ∀ p ∈ I, is_rem p G' 0 := by
+  constructor
+  · intro h
+    constructor
+    ·exact h.1
+    · intro p hp
+      exact (groebner_basis_rem_eq_zero_iff' h).mpr hp
+  · rintro ⟨hG', hp⟩
+    constructor
+    ·exact hG'
+    ·
+      have hG' : I = span G' := by
+        rw [←SetLike.coe_set_eq]
+        refine Set.eq_of_subset_of_subset ?_ (span_le.mpr hG')
+        intro p hp'
+        rw [SetLike.mem_coe, ←rem_mem_ideal_iff subset_span (hp p hp')]
+        exact Ideal.zero_mem _
+      rw [hG', ←SetLike.coe_set_eq]
+      apply Set.eq_of_subset_of_subset
+      · apply span_le.mpr
+        intro p'
+        intro hp'
+        rcases hp' with ⟨p,hp', hp'₁⟩
+        rw [←hp'₁]
+        specialize hp p (hG'.symm ▸ hp')
+        rcases hp with ⟨_, q, hrq, hp⟩
+        rw [add_zero] at hp
+        simp [leading_term_ideal_span_monomial, mem_ideal_span_monomial_image,
+              leading_term_def]
+        intro h
+        rw [←(leading_coeff_eq_zero_iff _).not, leading_coeff_def] at h
+        nth_rewrite 2 [hp] at h
+        rw [Finsupp.sum, coeff_sum] at h
+        obtain ⟨⟨g, hg⟩, hg₁⟩ :
+          ∃ (g : { x // x ∈ G' }), (g * q g).coeff p.multideg ≠ 0 := by
+          by_contra' hg
+          simp [hg] at h
+        use g
+        rw [←mem_support_iff] at hg₁
+        have gqg_ne_0 : g * q ⟨g, hg⟩ ≠ 0 := by
+          apply support_eq_empty.not.mp
+          exact Finset.nonempty_iff_ne_empty.mp (Set.nonempty_of_mem hg₁)
+        have ⟨g_ne_0, qg_ne_0⟩ := ne_zero_and_ne_zero_of_mul gqg_ne_0
+        constructor
+        ·exact ⟨hg, g_ne_0⟩
+        · specialize hrq g hg
+          have hrq := multideg_le_multideg_of_multideg''_le_multideg'' hrq
+          have hg₂ := le_multideg hg₁
+          rw [←eq_of_le_of_not_lt hrq (not_lt_of_le hg₂)]
+          rw [←multideg'_eq_multideg gqg_ne_0]
+          rw [multideg'_mul g_ne_0 qg_ne_0]
+          rw [multideg'_eq_multideg]
+          rw [le_add_iff_nonneg_right]
+          exact zero_le _
+      · unfold leading_term_ideal
+        apply span_le.mpr
+        refine subset_trans ?_ subset_span
+        exact Set.image_subset _ subset_span
+
 theorem groebner_basis_is_basis
   {G': Finset (MvPolynomial σ k)} {I : Ideal (MvPolynomial σ k)}
   (h : is_groebner_basis G' I) : I = span G' := by

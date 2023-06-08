@@ -33,6 +33,7 @@ I prove this statement by definition the division algorithm (`mv_div`, `quo`, `r
 - `exists_groebner_basis`: with a term order defined, if the indexes of variables is finite, then all the ideals of the multivariable ring have Gröbner basis
 - `groebner_basis_self`: Gröbner basis of a ideal is the Gröbner basis of the span of itself
 - `groebner_basis_rem_eq_zero_iff`: the remainder of every elements in a ideal divided by the Gröbner basis of the ideal must be 0
+- `groebner_basis_def`: for finite set $G'\subseteq k[x_i:x\in\sigma]$ and ideal $I$, $G'$ is a groebner basis of $I$ if and only if $G'\subseteq I$ and $0$ is a reminder of every $p\in I$ divided by $G'$
 - `groebner_basis_is_basis`: every ideal is equal to the span of its Gröbner basis
 - `groebner_basis_unique_rem`: the remainder of a multivariable divided by a Gröbner basis exists and is unique
 
