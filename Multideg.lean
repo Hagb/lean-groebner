@@ -120,6 +120,15 @@ lemma multideg_C: multideg (C a: MvPolynomial σ R) = 0 := by
   · -- simp? [ha]
     simp only [ha, ite_false, sup_singleton, id_eq]
 
+@[simp]
+lemma multideg''_C :
+  multideg'' (C a : MvPolynomial σ R) = if a = 0 then ⊥ else 0 := by
+  rw [multideg'', C_apply, support_monomial]
+  by_cases ha : a = 0
+  ·simp [ha]
+  · simp [ha]
+    rfl
+
 lemma multideg_0: multideg (0: MvPolynomial σ R) = 0 := multideg_zero
 lemma multideg''_0: multideg'' (0: MvPolynomial σ R) = ⊥ := multideg''_zero
 
@@ -334,10 +343,38 @@ lemma lm_eq_zero_iff: lm p = 0 ↔ p = 0 := by
 
 variable {p q: MvPolynomial σ R} (p_ne_zero: p≠0) (q_ne_zero: q≠0)
 
+lemma multideg_le_iff_multideg''_le {s : TermOrder (σ→₀ℕ)} :
+  p.multideg'' ≤ s ↔ p.multideg ≤ s := by
+  by_cases hp : p = 0
+  ·simp [hp]
+  ·simp [←multideg'_eq_multideg'' hp, multideg'_eq_multideg]
+
+lemma le_multideg_of_le_multideg'' {s : TermOrder (σ→₀ℕ)}
+  (h : s ≤ p.multideg'') : s ≤ p.multideg := by
+  by_cases hp : p = 0
+  ·simp [hp] at h
+  · simp [←multideg'_eq_multideg'' hp, multideg'_eq_multideg] at h
+    exact h
+
+lemma multideg_le_multideg_of_multideg''_le_multideg''
+  (h : p.multideg'' ≤ q.multideg'') : p.multideg ≤ q.multideg := by
+  by_cases hp : p = 0
+  ·simp [hp]
+  · by_cases hq : q = 0
+    ·simp [hq, multideg''_def, hp] at h
+    · simp [←multideg'_eq_multideg'', hp, hq, multideg'_eq_multideg] at h
+      exact h
+
 
 lemma le_multideg' {i: TermOrder (σ→₀ℕ)} (h: i ∈ p.support):
   i ≤ p.multideg' p_ne_zero
   := Finset.le_max' (α:=TermOrder (σ→₀ℕ)) p.support i h
+
+lemma le_multideg'' {i: TermOrder (σ→₀ℕ)} (h: i ∈ p.support):
+  i ≤ p.multideg'' := by
+  by_cases hp : p = 0
+  · simp [hp] at h
+  · simp [←multideg'_eq_multideg'' hp, le_multideg' hp h]
 
 lemma le_multideg {i: TermOrder (σ→₀ℕ)} (h: i ∈ p.support): i ≤ p.multideg
   := by
@@ -632,6 +669,22 @@ theorem multideg_add_le: multideg (p+q) ≤ max p.multideg q.multideg := by
     simp only [ne_eq, not_le] at h
     exact multideg_add_le_left (le_of_lt h)
 
+theorem multideg''_add_le : multideg'' (p+q) ≤ max p.multideg'' q.multideg''
+:= by
+  by_cases h : p = 0 ∨ q = 0
+  ·cases' h with h h <;> simp [h]
+  ·
+    by_cases hpq : p + q = 0
+    ·simp [hpq]
+    push_neg at h
+    cases' h with hp hq
+    rw [←multideg'_eq_multideg'' hp, ←multideg'_eq_multideg'' hq,
+        ←multideg'_eq_multideg'' hpq, multideg'_eq_multideg,
+          multideg'_eq_multideg, multideg'_eq_multideg]
+    have := multideg_add_le (p:=p) (q:=q)
+    simp at this
+    simp [this]
+
 lemma multideg_add_eq_right
     {p q: MvPolynomial σ R} (h: multideg p < multideg q):
   multideg (p+q) = multideg q := by
@@ -713,6 +766,15 @@ by
     simp only [multideg, support_monomial, ha, ite_false, sup_singleton, id_eq]
 
 @[simp]
+lemma multideg''_monomial :
+  multideg'' (monomial s a) =
+    if a = 0 then ⊥ else (s : WithBot (σ→₀ℕ)) :=
+by
+  by_cases ha : a = 0
+  · simp [ha]
+  · simp [ha, multideg'', support_monomial]
+
+@[simp]
 lemma leading_coeff_monomial : leading_coeff (monomial s a) = a := by
   by_cases ha : a = 0 <;> simp [leading_coeff_def, multideg_monomial, ha]
 
@@ -727,6 +789,12 @@ by
   intro hp
   -- simp? [hp]
   simp only [hp, multideg_zero]
+
+@[simp] lemma multideg''_leading_term : p.leading_term.multideg'' = p.multideg'' :=
+by
+  rw [leading_term_def]
+  simp [multideg''_def]
+  by_cases h : p = 0 <;> simp [h]
 
 @[simp] lemma multideg_lm : p.lm.multideg = p.multideg := by
   rw [lm]
@@ -769,6 +837,10 @@ variable {R : Type _} [CommRing R] (p q : MvPolynomial σ R)
 
 @[simp] lemma multideg_neg : (-p).multideg = p.multideg := by
   rw [multideg, multideg]
+  simp only [support_neg]
+
+@[simp] lemma multideg''_neg : (-p).multideg'' = p.multideg'' := by
+  rw [multideg'', multideg'']
   simp only [support_neg]
 
 @[simp] lemma leading_coeff_neg : (-p).leading_coeff = -p.leading_coeff := by

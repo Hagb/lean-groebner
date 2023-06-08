@@ -244,14 +244,12 @@ theorem quo_quo_sum_add_rem: (p.quo G).sum (·*·) + p.rem G = p := by
   simp only [quo_sum_eq_sub_rem, sub_add_cancel]
 
 @[simp]
-lemma step_multideg_quo_mul_le (hq: q ∈ G) :
-   (q * ((p.step G).1 ⟨q, List.mem_toFinset.mpr hq⟩)).multideg ≤ p.multideg :=
+lemma step_multideg''_quo_mul_le (hq: q ∈ G) :
+   (q * ((p.step G).1 ⟨q, List.mem_toFinset.mpr hq⟩)).multideg'' ≤ p.multideg'' :=
 by
   rw [step_apply]
   by_cases hp: p = 0
-  ·-- simp? [hp]
-    simp only [hp, zero_sub, ite_true, Finsupp.coe_zero, Pi.zero_apply,
-                mul_zero, multideg_zero, le_refl]
+  ·simp [hp]
   ·
     -- simp? [hp]
     simp only [hp, ne_eq, ite_false, mul_eq_zero]
@@ -267,41 +265,37 @@ by
         -- simp? [hg]
         simp only [hg, ite_true, mul_eq_zero, ne_eq, ge_iff_le]
         generalize_proofs _ h
-        rw [←multideg_leading_term, leading_term_mul'_right,
-            multideg_leading_term, ←h.choose_spec, multideg_leading_term]
-      ·--simp? [hg]
-        simp only [hg, ite_false, multideg_zero, zero_le''']
-    ·
-      -- simp? [hg]
-      simp only [hg, dite_false, Finsupp.coe_zero, Pi.zero_apply, mul_zero,
-                multideg_zero, ne_eq, zero_le''']
+        rw [←multideg''_leading_term, leading_term_mul'_right,
+            multideg''_leading_term, ←h.choose_spec, multideg''_leading_term]
+      ·simp [hg]
+    ·simp [hg]
 
-theorem multideg_quo_mul_le (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
+theorem multideg''_quo_mul_le (p : MvPolynomial σ k) (G : List (MvPolynomial σ k))
   (q: MvPolynomial σ k) (hq: q ∈ G):
-  (q * (p.quo G ⟨q, List.mem_toFinset.mpr hq⟩)).multideg ≤ p.multideg :=
+  (q * (p.quo G ⟨q, List.mem_toFinset.mpr hq⟩)).multideg'' ≤ p.multideg'' :=
 by
   rw [quo_apply]
   unfold mv_div
   by_cases hp: p = 0
   ·
     -- simp? [hp]
-    simp only [hp, multideg_zero, dite_eq_ite, ite_true,
+    simp only [hp, multideg''_zero, dite_eq_ite, ite_true,
               Finsupp.coe_zero, Pi.zero_apply, mul_zero, le_refl]
   ·
     -- simp? [hp]
     simp only [hp, ne_eq, dite_eq_ite, ite_false, Finsupp.coe_add,
               Pi.add_apply, mul_eq_zero]
     rw [mul_add]
-    apply le_trans multideg_add_le
-    -- simp? [step_multideg_quo_mul_le p G hq]
+    apply le_trans multideg''_add_le
+    -- simp? [step_multideg''_quo_mul_le p G hq]
     simp only [mul_eq_zero, ne_eq, ge_iff_le, max_le_iff,
-              step_multideg_quo_mul_le p G hq, true_and]
+              step_multideg''_quo_mul_le p G hq, true_and]
       -- Why step_multideg_quo_mul_le not work?
     rw [←quo_apply]
-    apply le_trans (multideg_quo_mul_le
+    apply le_trans (multideg''_quo_mul_le
                     ((p.step G).2 - (p.step G).2.coeff (multideg p) • lm p)
                     G q hq)
-    exact step_sub_multideg_le G
+    exact le_of_lt (step_sub_multideg''_lt G hp)
 termination_by _ => multideg'' p
 decreasing_by exact step_sub_multideg''_lt G hp
 
@@ -459,7 +453,7 @@ def is_rem
 := (∀ g ∈ G', g ≠ 0 → ∀ s ∈ r.support, ¬LE.le (α:=σ→₀ℕ) g.multideg s) ∧
     ∃(q : G' →₀ MvPolynomial σ k),
       (∀(g: MvPolynomial σ k) (hg : g ∈ G'),
-        (g * q ⟨g, hg⟩).multideg ≤ p.multideg )∧
+        (g * q ⟨g, hg⟩).multideg'' ≤ p.multideg'' )∧
       p = q.sum (·*·) + r
 
 theorem rem_is_rem : is_rem p G.toFinset (p.rem G) := by
@@ -472,7 +466,7 @@ theorem rem_is_rem : is_rem p G.toFinset (p.rem G) := by
     constructor
     ·
       intros g hg
-      exact multideg_quo_mul_le p G g (List.mem_toFinset.mp hg)
+      exact multideg''_quo_mul_le p G g (List.mem_toFinset.mp hg)
     ·
       exact (quo_quo_sum_add_rem p G).symm
 
