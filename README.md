@@ -39,7 +39,7 @@ I prove this statement by definition the division algorithm (`mv_div`, `quo`, `r
 
 ## TODO
 
-- Refactor to allow to deal with different kinds of term orders (there is a related [zulip topic](https://leanprover.zulipchat.com/#narrow/search/.22i.20have.20formalized.22))
+- Refactor to allow to deal with different kinds of term orders (there is a related [zulip topic](https://leanprover.zulipchat.com/#narrow/stream/113488-general/topic/Formalization.20of.20multideg.2C.20division.2C.20etc.2E.20of.20MvPolynomial))
 - Lexicographic order is a term order
 - remove `multideg'`
 - More properties of Gröbner basis
