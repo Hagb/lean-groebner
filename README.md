@@ -1,6 +1,11 @@
 # Lean4 formalization of Gröbner basis
 
-(sorry for my bad English and bad math)
+This project has been archived, since
+
+- there has been [an independent formalization](https://github.com/leanprover-community/mathlib4/pull/16584) of [monomial order (term order)](https://leanprover-community.github.io/mathlib4_docs/find/#doc/MonomialOrder) and [division](https://leanprover-community.github.io/mathlib4_docs/find/#doc/MonomialOrder.div) made by [AntoineChambert-Loir](https://github.com/AntoineChambert-Loir) and merged into Mathlib4, and they're also more general than the version of this project;
+- this project cannot build on the latest Lean4 and Mathlib4;
+- I and [tsuki8](https://github.com/tsuki8) are working on Gröbner basis (<https://github.com/WuProver/groebner_proj>), based on the latest Mathlib
+
 
 I am learning computational algebraic geometry, and have formalized Gröbner basis (and other things it needs) of multivariate polynomial in [Lean 4](https://leanprover.github.io).
 
